@@ -1,6 +1,15 @@
 *.class
 *.log
 
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Maven
+log/
+target/
+
 # sbt specific
 .cache
 .history
