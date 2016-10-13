@@ -51,13 +51,13 @@ public class MailBatchProcessor {
 				String month = mail.f0.substring(0, 7);
 				// extract email address from the sender
 				String email = mail.f1.substring(mail.f1.lastIndexOf("<") + 1, mail.f1.length() - 1);
-
+				// < 2014-09, Anirvan.Basu@alumni.INSEAD.edu >
 				return new Tuple2<>(month, email);
 			}
 			
 		})			
 		// group by month and email address and count number of records per group
-		.groupBy(0, 1).reduceGroup(new GroupReduceFunction<Tuple2<String,String>,  Tuple3<String ,String, Integer>>() {
+		.groupBy(1, 0).reduceGroup(new GroupReduceFunction<Tuple2<String,String>,  Tuple3<String ,String, Integer>>() {
 
 			@Override
 			public void reduce(Iterable<Tuple2<String, String>> mails, Collector<Tuple3<String, String, Integer>> out) throws Exception {
