@@ -1,4 +1,4 @@
-package mailexample;
+package batch;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.MapFunction;
