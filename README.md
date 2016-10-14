@@ -6,3 +6,9 @@ See following [instructions ](https://gist.github.com/lidox/ae71fe107792534cc13c
 ## Get familiar with Apache Flink
 
 [Following guide](http://dataartisans.github.io/flink-training/) is a good beginning!
+
+## Get familiar with Apache Kafka
+
+[Kafka example project](https://github.com/dataArtisans/kafka-example) on Github
+
+Combine [Kafka with Flink](http://data-artisans.com/kafka-flink-a-practical-how-to)
