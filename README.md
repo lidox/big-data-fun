@@ -11,4 +11,4 @@ See following [instructions ](https://gist.github.com/lidox/ae71fe107792534cc13c
 
 [Kafka example project](https://github.com/dataArtisans/kafka-example) on Github
 
-Combine [Kafka with Flink](http://data-artisans.com/kafka-flink-a-practical-how-to)
+Combine [Kafka with Flink](http://data-artisans.com/kafka-flink-a-practical-how-to) or better check [this cool blog post](https://www.javacodegeeks.com/2016/10/getting-started-apache-flink-kafka.html) to do so!
