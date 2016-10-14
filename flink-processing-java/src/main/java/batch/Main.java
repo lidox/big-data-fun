@@ -1,5 +1,8 @@
 package batch;
 
+import kafka.Kafka;
+import kafka.consumer.KafkaStream;
+import stream.MyKafkaStream;
 import stream.TaxiStreamProcessor;
 
 public class Main {
@@ -14,9 +17,12 @@ public class Main {
 		// MailBatchProcessor batch = new MailBatchProcessor(csvPath);
 		// batch.getUserAndMailCount();
 		
-		String taxiCsvPath = csvHomePath + "nycTaxiRides.gz";
-		TaxiStreamProcessor stream = new TaxiStreamProcessor(taxiCsvPath);
-		stream.test();
+		//String taxiCsvPath = csvHomePath + "nycTaxiRides.gz";
+		//TaxiStreamProcessor stream = new TaxiStreamProcessor(taxiCsvPath);
+		//stream.test();
+		
+		MyKafkaStream stream = new MyKafkaStream();
+		stream.listenStream();
 	}
 
 }
