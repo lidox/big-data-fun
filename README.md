@@ -12,3 +12,8 @@ See following [instructions ](https://gist.github.com/lidox/ae71fe107792534cc13c
 [Kafka example project](https://github.com/dataArtisans/kafka-example) on Github
 
 Combine [Kafka with Flink](http://data-artisans.com/kafka-flink-a-practical-how-to) or better check [this cool blog post](https://www.javacodegeeks.com/2016/10/getting-started-apache-flink-kafka.html) to do so!
+
+To get Kafka to work on Android -> maybe try to build an apk via Maven 
+and add all dependecies from already working kafka-flink client (pom.xml) to android project.
+
+See folling [blog article](http://www.vogella.com/tutorials/AndroidBuildMaven/article.html)
