@@ -17,3 +17,6 @@ To get Kafka to work on Android -> maybe try to build an apk via Maven
 and add all dependecies from already working kafka-flink client (pom.xml) to android project.
 
 See folling [blog article](http://www.vogella.com/tutorials/AndroidBuildMaven/article.html)
+
+## Connect Kafka with HDFS
+https://www.youtube.com/watch?v=imDtlYXpRgc
