@@ -20,3 +20,7 @@ See folling [blog article](http://www.vogella.com/tutorials/AndroidBuildMaven/ar
 
 ## Connect Kafka with HDFS
 https://www.youtube.com/watch?v=imDtlYXpRgc
+
+Download:
+https://archive.apache.org/dist/hadoop/core/hadoop-2.6.0/
+http://pingax.com/install-hadoop2-6-0-on-ubuntu/
