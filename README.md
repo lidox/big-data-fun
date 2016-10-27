@@ -30,7 +30,8 @@ https://archive.apache.org/dist/hadoop/core/hadoop-2.6.0/
 ## Connect Kafka with HDFS
 https://www.youtube.com/watch?v=imDtlYXpRgc
 
-
+## Elastic Search 
+How to [setup](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html)
 
 # Demo
 ## Run Hadoop 2.6.0
