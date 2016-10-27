@@ -18,9 +18,26 @@ and add all dependecies from already working kafka-flink client (pom.xml) to and
 
 See folling [blog article](http://www.vogella.com/tutorials/AndroidBuildMaven/article.html)
 
+
+## Get familiar with Hadoop 2.6.0
+Download:
+https://archive.apache.org/dist/hadoop/core/hadoop-2.6.0/
+
+## Install:
+1. [Best guide](http://www.bogotobogo.com/Hadoop/BigData_hadoop_Install_on_ubuntu_single_node_cluster.php)
+2. [Good guide](http://pingax.com/install-hadoop2-6-0-on-ubuntu)
+
 ## Connect Kafka with HDFS
 https://www.youtube.com/watch?v=imDtlYXpRgc
 
-Download:
-https://archive.apache.org/dist/hadoop/core/hadoop-2.6.0/
-http://pingax.com/install-hadoop2-6-0-on-ubuntu/
+
+
+# Demo
+## Run Hadoop 2.6.0
+```
+cd /usr/local/hadoop/sbin
+
+sudo su hduser
+
+start-all.sh
+```
