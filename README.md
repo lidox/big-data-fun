@@ -41,3 +41,10 @@ sudo su hduser
 
 start-all.sh
 ```
+
+## Monitoring Hadoop
+[Web UI of the NameNode daemon](http://localhost:50070)
+
+[Logs](http://localhost:50070/logs/)
+
+
