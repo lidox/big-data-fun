@@ -8,6 +8,15 @@ import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer09;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 
+/**
+ * Example based on following blog post: https://www.javacodegeeks.com/2016/10/getting-started-apache-flink-kafka.html
+ * 
+ * Kafka version: kafka_2.11-0.9.0.0
+ * Flink version: 1.1.2
+ * 
+ * @author lidox
+ *
+ */
 public class Producer {
 
 	
@@ -16,7 +25,7 @@ public class Producer {
 
 	    Properties properties = new Properties();
 	    properties.setProperty("bootstrap.servers", "localhost:9092"); 
-
+	    //properties.setProperty("bootstrap.servers", "134.99.218.18:443"); 
 	    DataStream<String> stream = env.addSource(new SimpleStringGenerator());
 	    stream.addSink(new FlinkKafkaProducer09<>("flink-demo", new SimpleStringSchema(), properties));
 

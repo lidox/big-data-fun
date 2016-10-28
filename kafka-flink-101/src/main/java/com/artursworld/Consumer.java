@@ -12,6 +12,7 @@ import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
  * Example based on following blog post: https://www.javacodegeeks.com/2016/10/getting-started-apache-flink-kafka.html
  * 
  * Kafka version: kafka_2.11-0.9.0.0
+ * Flink version: 1.1.2
  * 
  * @author lidox
  *
@@ -24,12 +25,15 @@ public class Consumer {
 
 	    Properties properties = new Properties();
 	    properties.setProperty("bootstrap.servers", "localhost:9092");
+	    //properties.setProperty("bootstrap.servers", "134.99.218.18:443"); 
+	   
 	    properties.setProperty("group.id", "flink_consumer");
 
 	    DataStream<String> stream = env.addSource(new FlinkKafkaConsumer09<>(
-	        "flink-demo", new SimpleStringSchema(), properties) );
+	        "test", new SimpleStringSchema(), properties) );
 
 	    stream.map(new MapFunction<String, String>() {
+	    	
 	      private static final long serialVersionUID = 787878747690202L;
 
 	      @Override
