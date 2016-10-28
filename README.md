@@ -31,7 +31,7 @@ https://archive.apache.org/dist/hadoop/core/hadoop-2.6.0/
 https://www.youtube.com/watch?v=imDtlYXpRgc
 
 ## Elastic Search 
-How to [setup](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html)
+How to [setup](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html) elastic search. Try [Ubuntu installation guide] (https://www.elastic.co/guide/en/elasticsearch/reference/current/deb.html). 
 
 # Demo
 ## Run Hadoop 2.6.0
