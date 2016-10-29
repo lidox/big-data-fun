@@ -89,6 +89,58 @@ public class ElasticSink {
 		
 	}
 	
+	public void sink2(){
+	    try {
+	    	writeElastic(input);
+			//env.execute();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void writeElastic(DataStream<TaxiRide> input) {
+
+	    Map<String, String> config = new HashMap<>();
+
+	    // This instructs the sink to emit after every element, otherwise they would be buffered
+		config.put("bulk.flush.max.actions", "1");
+		config.put("cluster.name", CLUSTER_NAME);
+
+	    try {
+	        // Add elasticsearch hosts on startup
+	        List<InetSocketAddress> transports = new ArrayList<>();
+	        transports.add(new InetSocketAddress("127.0.0.1", 9300)); // port is 9300 not 9200 for ES TransportClient
+
+	        ElasticsearchSinkFunction<TaxiRide> indexLog = new ElasticsearchSinkFunction<TaxiRide>() {
+	            public IndexRequest createIndexRequest(TaxiRide element) {
+	                //String[] logContent = element.toString().trim().split("\t");
+	                Map<String, String> esJson = new HashMap<>();
+	                esJson.put("endLat", element.endLat + "");
+	                esJson.put("isStart", element.isStart+"");
+
+	                return Requests
+	                		//curl -XPUT 'localhost:9200/viper-test/_mapping/viper-log' -d '{
+	                		// curl -XPUT "http://localhost:9200/nyc-idx/_mapping/popular-locations" -d'
+	                        .indexRequest()
+	                        .index("nyc-idx")
+	                        .type("popular-locations")
+	                        .source(esJson);
+	            }
+
+	            @Override
+	            public void process(TaxiRide element, RuntimeContext ctx, RequestIndexer indexer) {
+	                indexer.add(createIndexRequest(element));
+	            }
+	        };
+
+	        ElasticsearchSink esSink = new ElasticsearchSink(config, transports, indexLog);
+	        input.addSink(esSink);
+	    } catch (Exception e) {
+	        System.out.println(e);
+	    }
+	}
+	
+	
 	// http://stackoverflow.com/questions/37514624/apache-flink-integration-with-elasticsearch
 	// https://ci.apache.org/projects/flink/flink-docs-master/dev/connectors/elasticsearch.html
 	private static class TestElasticsearchSinkFunction implements ElasticsearchSinkFunction<TaxiRide> {

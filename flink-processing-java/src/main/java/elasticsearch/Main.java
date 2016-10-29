@@ -13,9 +13,9 @@ public class Main {
 			 
 			 // loading DataStream
 			 ElasticSink elastic = new ElasticSink(csvPath);
-			 
+			 elastic.sink2();
 			 //elastic.print();
-			 elastic.sink();
+			 //elastic.sink();
 			 
 			
 		} catch (Exception e) {
