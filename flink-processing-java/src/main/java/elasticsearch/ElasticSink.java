@@ -58,7 +58,7 @@ public class ElasticSink {
 		this.env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 		
 		// get the taxi ride data stream
-		input = env.addSource(new TaxiRideSource(this.csvPath, maxEventDelay, servingSpeedFactor));
+		//input = env.addSource(new TaxiRideSource(this.csvPath, maxEventDelay, servingSpeedFactor));
 		//env.registerTypeWithKryoSerializer([LocalDateTime], classOf[JodaLocalDateTimeSerializer]); 
 	}
 	
@@ -101,17 +101,15 @@ public class ElasticSink {
 	 */
 	public void sink2(){
 	    try {
-	    	writeElastic(input);
+	    	viperStream = getKafkaStream(env);
+	    	writeElastic(viperStream);
 			//env.execute();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void writeElastic(DataStream<TaxiRide> input) {
-		// get Stream
-		viperStream = getKafkaStream(env);
-		
+	public void writeElastic(DataStream<String> input) {		
 	    Map<String, String> config = new HashMap<>();
 
 	    //TODO: hier weitermachen! clustername: try to sink simple streams
@@ -124,24 +122,26 @@ public class ElasticSink {
 	        List<InetSocketAddress> transports = new ArrayList<>();
 	        transports.add(new InetSocketAddress("127.0.0.1", 9300)); // port is 9300 not 9200 for ES TransportClient
 
-	        ElasticsearchSinkFunction<TaxiRide> indexLog = new ElasticsearchSinkFunction<TaxiRide>() {
-	            public IndexRequest createIndexRequest(TaxiRide element) {
-	                //String[] logContent = element.toString().trim().split("\t");
+	        ElasticsearchSinkFunction<String> indexLog = new ElasticsearchSinkFunction<String>() {
+	            public IndexRequest createIndexRequest(String element) {
+	                String[] logContent = element.toString().trim().split(",");
 	                Map<String, String> esJson = new HashMap<>();
-	                esJson.put("endLat", element.endLat + "");
-	                esJson.put("isStart", element.isStart+"");
+	                esJson.put("first", logContent[0]);
+	                esJson.put("last", logContent[1]);
 
 	                return Requests
 	                		//curl -XPUT 'localhost:9200/viper-test/_mapping/viper-log' -d '{
 	                		// curl -XPUT "http://localhost:9200/nyc-idx/_mapping/popular-locations" -d'
 	                        .indexRequest()
-	                        .index("nyc-idx")
-	                        .type("popular-locations")
+	                        //.index("nyc-idx")
+	                        //.type("popular-locations")
+	                        .index("viper-test")
+	                        .type("viper-log")
 	                        .source(esJson);
 	            }
 
 	            @Override
-	            public void process(TaxiRide element, RuntimeContext ctx, RequestIndexer indexer) {
+	            public void process(String element, RuntimeContext ctx, RequestIndexer indexer) {
 	                indexer.add(createIndexRequest(element));
 	            }
 	        };
@@ -187,10 +187,9 @@ public class ElasticSink {
 	    env.enableCheckpointing(5000); 
 	    Properties properties = new Properties();
 	    properties.setProperty("bootstrap.servers", "localhost:9092"); 
-	    properties.setProperty("group.id", "test");
+	    properties.setProperty("group.id", "viper-test");
 
-	    DataStream<String> stream= env.addSource(
-	            new FlinkKafkaConsumer09<>("test", new SimpleStringSchema(), properties));
+	    DataStream<String> stream= env.addSource(new FlinkKafkaConsumer09<>("viper-test", new SimpleStringSchema(), properties));
 	    return stream;
 	}
 	
