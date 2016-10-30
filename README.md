@@ -73,4 +73,14 @@ cd kafka_2.10-0.8.2.1
 # produce something into the topic (write something and hit enter)
 ./bin/kafka-console-producer.sh --topic test --broker-list localhost:9092
 ```
+## Start ElasticSearch
+```
+cd /Dokumente/elasticsearch-2.3.4/bin
 
+# start elasticsearch
+./elasticsearch --cluster.name my-demo --node.name my-node
+
+# make a search
+curl 'localhost:9200/viper-test/viper-log/_search?regina'
+
+```
