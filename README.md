@@ -32,6 +32,7 @@ https://www.youtube.com/watch?v=imDtlYXpRgc
 
 ## Elastic Search 
 How to [setup](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html) elastic search. Try [Ubuntu installation guide] (https://www.elastic.co/guide/en/elasticsearch/reference/current/deb.html). 
+[ElasticSearch Installation 2.3.2](https://www.elastic.co/guide/en/elasticsearch/reference/2.3/_installation.html)
 
 How to use the [Flink elasticsearch connector](https://ci.apache.org/projects/flink/flink-docs-master/dev/connectors/elasticsearch.html)
 
