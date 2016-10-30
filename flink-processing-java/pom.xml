@@ -57,6 +57,12 @@
 		  <artifactId>flink-connector-elasticsearch_2.10</artifactId>
 		  <version>${flink.version}</version>
 		</dependency>
+		
+		<dependency>
+		    <groupId>de.javakaffee</groupId>
+		    <artifactId>kryo-serializers</artifactId>
+		    <version>0.30</version>
+		</dependency>
 		<!-- Flinks Kafka connector -->
 		<!--
 		<dependency>

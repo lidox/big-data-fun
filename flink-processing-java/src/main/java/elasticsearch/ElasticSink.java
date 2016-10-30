@@ -2,33 +2,36 @@ package elasticsearch;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+
+import model.TaxiRide;
+import model.TaxiRideSource;
 
 import org.apache.flink.api.common.functions.RuntimeContext;
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.typeutils.runtime.kryo.Serializers;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Maps;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-
-
-
-
 import org.apache.flink.streaming.connectors.elasticsearch2.ElasticsearchSink;
 import org.apache.flink.streaming.connectors.elasticsearch2.ElasticsearchSinkFunction;
 import org.apache.flink.streaming.connectors.elasticsearch2.RequestIndexer;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer09;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer09;
+import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Requests;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.common.transport.TransportAddress;
+import org.elasticsearch.common.joda.time.DateTime;
+import org.elasticsearch.common.joda.time.Interval;
 
-import com.dataartisans.flinktraining.exercises.datastream_java.datatypes.TaxiRide;
-import com.dataartisans.flinktraining.exercises.datastream_java.sources.TaxiRideSource;
+import de.javakaffee.kryoserializers.jodatime.JodaDateTimeSerializer;
+import de.javakaffee.kryoserializers.jodatime.JodaIntervalSerializer;
+import de.javakaffee.kryoserializers.jodatime.JodaLocalDateTimeSerializer;
 
 public class ElasticSink {
 
@@ -38,6 +41,7 @@ public class ElasticSink {
 	private final int maxEventDelay = 60;       // events are out of order by max 60 seconds
 	private final int servingSpeedFactor = 600; // events of 10 minutes are served in 1 second
 	private DataStream<TaxiRide> input;  
+	private DataStream<String> viperStream;  
 	
 	// config
 	public static final String INDEX_NAME = "nyc-idx"; 
@@ -45,6 +49,8 @@ public class ElasticSink {
 	
 	public ElasticSink(String path) {
 		this.env = StreamExecutionEnvironment.getExecutionEnvironment();
+		env.registerTypeWithKryoSerializer(DateTime.class, JodaDateTimeSerializer.class);
+		env.registerTypeWithKryoSerializer(Interval.class, JodaIntervalSerializer.class);
 		
 		this.csvPath = path;
 		
@@ -53,6 +59,7 @@ public class ElasticSink {
 		
 		// get the taxi ride data stream
 		input = env.addSource(new TaxiRideSource(this.csvPath, maxEventDelay, servingSpeedFactor));
+		//env.registerTypeWithKryoSerializer([LocalDateTime], classOf[JodaLocalDateTimeSerializer]); 
 	}
 	
 	/**
@@ -89,6 +96,9 @@ public class ElasticSink {
 		
 	}
 	
+	/**
+	 * Sink String stream from kafka to elasticsearch
+	 */
 	public void sink2(){
 	    try {
 	    	writeElastic(input);
@@ -99,9 +109,12 @@ public class ElasticSink {
 	}
 	
 	public void writeElastic(DataStream<TaxiRide> input) {
-
+		// get Stream
+		viperStream = getKafkaStream(env);
+		
 	    Map<String, String> config = new HashMap<>();
 
+	    //TODO: hier weitermachen! clustername: try to sink simple streams
 	    // This instructs the sink to emit after every element, otherwise they would be buffered
 		config.put("bulk.flush.max.actions", "1");
 		config.put("cluster.name", CLUSTER_NAME);
@@ -163,6 +176,22 @@ public class ElasticSink {
 	        indexer.add(createIndexRequest(element.toString()));
 	    }
 
+	}
+	
+	/**
+	 * Get the simple String Stream from Kafka
+	 * @param env the running environment
+	 * @return the new DataStream by Kafka
+	 */
+	public DataStream<String> getKafkaStream(StreamExecutionEnvironment env) {
+	    env.enableCheckpointing(5000); 
+	    Properties properties = new Properties();
+	    properties.setProperty("bootstrap.servers", "localhost:9092"); 
+	    properties.setProperty("group.id", "test");
+
+	    DataStream<String> stream= env.addSource(
+	            new FlinkKafkaConsumer09<>("test", new SimpleStringSchema(), properties));
+	    return stream;
 	}
 	
 
