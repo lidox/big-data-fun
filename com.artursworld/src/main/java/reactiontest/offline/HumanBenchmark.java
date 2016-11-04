@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
-import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -280,28 +279,71 @@ public class HumanBenchmark {
 		}
 		
 	}
+	
+	/*
+	public static class Counter implements FlatMapFunction<Tuple2<Double, Integer>, Tuple2<Double, Integer>>{
+
+		private static final long serialVersionUID = 956347222383551L;
+
+		@Override
+		public void flatMap(Tuple2<Double, Integer> value, Collector<Tuple2<Double, Integer>> out) {
+			
+			int globalCounter = 1;
+			int userCount = value.f1;
+			double reactionTime = value.f0;
+			
+			for(int i = 0; i < userCount; i++){
+				out.collect(new Tuple2<Double, Integer>(reactionTime, globalCounter));
+				globalCounter++;
+			}
+			
+		}
+		
+	}
+	*/
 
 	public double getMedianReactionTime() throws Exception {
 		DataSet<Tuple2<Double, Integer>> allReactionTests = data.flatMap(new Medianizer());
 
 		List<Tuple2<Double, Integer>> reactionTimeList = allReactionTests.collect();
 		
-		double median = getMedianByCollection(reactionTimeList);
+		double median = getMedianByList(reactionTimeList);
 		
 		return median;
 	}
+	
+	/*
+	public double getMedian() throws Exception{
+		DataSet<Tuple2<Double, Integer>> data = this.data.flatMap(new Counter());
+
+		data.print();
+		
+		
+		double median = 0;
+		
+		// calculate median
+		int itemCount = dataList.size();
+		if (itemCount % 2 == 0)
+		    median = ((double) dataList.get(itemCount/2).f0 + (double) dataList.get(itemCount /2 - 1).f0)/2;
+		else
+		    median = (double) dataList.get(itemCount/2).f0;
+		
+		return median;
+	}
+	*/
 
 	/**
 	 * Get the median by given list
 	 * @param reactionTimeList the list containing reaction times
 	 * @return the median of the reaction times
 	 */
-	private double getMedianByCollection(List<Tuple2<Double, Integer>> reactionTimeList) {
+	private double getMedianByList(List<Tuple2<Double, Integer>> reactionTimeList) {
 		double median = 0;
-		if (reactionTimeList.size() % 2 == 0)
-		    median = ((double) reactionTimeList.get(reactionTimeList.size()/2).f0 + (double) reactionTimeList.get(reactionTimeList.size() /2 - 1).f0)/2;
+		int itemCount = reactionTimeList.size();
+		if (itemCount % 2 == 0)
+		    median = ((double) reactionTimeList.get(itemCount/2).f0 + (double) reactionTimeList.get(itemCount /2 - 1).f0)/2;
 		else
-		    median = (double) reactionTimeList.get(reactionTimeList.size()/2).f0;
+		    median = (double) reactionTimeList.get(itemCount/2).f0;
 		return median;
 	}
 }
