@@ -8,10 +8,12 @@ import org.apache.flink.api.java.tuple.Tuple2;
  */
 public class Main {
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		
 		// read data using flatMap function
 		HumanBenchmark human = new HumanBenchmark();
+		human.loadDataSetOfOctober2016();
+		
 		human.printInputData();
 		
 		// metric: count using flinks sum function
@@ -33,7 +35,13 @@ public class Main {
 		System.err.println("Max user count = "+maxAggregate.f1+" with RT = "+maxAggregate.f0);
 		
 		// metric average
-		//TODO:
+		double average = human.getAverageReaction();
+		System.err.println("AVG reactionTime = " + average);
+		
+		// metric average for all the data
+		human.loadDataSetOfAllTime();
+		double averageAll = human.getAverageReaction();
+		System.err.println("Alltime AVG reactionTime = " + averageAll);
 		
 		// metric median
 		//TODO: 

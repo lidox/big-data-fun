@@ -27,11 +27,19 @@ public class HumanBenchmark {
 	public HumanBenchmark() {
 		try {		
 			env = ExecutionEnvironment.getExecutionEnvironment();
-			DataSet<String> inputData = env.readTextFile(getFilePath(filePathJSON));
-			data = inputData.flatMap(new Tokenizer());
 		} catch(Exception e) {
 			  e.printStackTrace();
 		}
+	}
+	
+	public void loadDataSetOfAllTime(){
+		DataSet<String> inputData = env.readTextFile(getFilePath("human-benchmark-alltime.json"));
+		data = inputData.flatMap(new Tokenizer());
+	}
+	
+	public void loadDataSetOfOctober2016(){
+		DataSet<String> inputData = env.readTextFile(getFilePath(filePathJSON));
+		data = inputData.flatMap(new Tokenizer());
 	}
 	
 	public void printInputData(){
@@ -215,6 +223,37 @@ public class HumanBenchmark {
 		}
 		return ret;
 	}
-	
 
+	/**
+	 * computes the average reaction time of the users
+	 * @return the average reaction time 
+	 * @throws Exception
+	 */
+	public double getAverageReaction() throws Exception {
+		DataSet<Tuple2<Double, Integer>> output = data.flatMap(new Averagenizer());
+		output = output.sum(0).andSum(1);
+		Tuple2<Double, Integer> finalTuple = output.collect().get(0);
+		return finalTuple.f0 / finalTuple.f1;
+	}
+	
+	/**
+	 * 
+	 * Multiply reaction time with user count and return tuple
+	 *
+	 */
+	public static class Averagenizer implements FlatMapFunction<Tuple2<Double, Integer>, Tuple2<Double, Integer>>{
+
+		private static final long serialVersionUID = 71246547222383551L;
+
+		@Override
+		public void flatMap(Tuple2<Double, Integer> value, Collector<Tuple2<Double, Integer>> out) {
+			
+			double reactionTime = value.f0;
+			int userCount = value.f1;
+			double reactionTimeSum = reactionTime * userCount;
+			
+			out.collect(new Tuple2<Double, Integer>(reactionTimeSum, userCount));
+		}
+		
+	}
 }
