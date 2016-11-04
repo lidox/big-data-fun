@@ -117,7 +117,6 @@ public class HumanBenchmark {
 
 		@Override
 		public void flatMap(String value, Collector<Tuple2<Double, Integer>> out) {
-			// get string of data#
 			List<Tuple2<Double, Integer>> jsonList = getListByJSON(value);
 			
 			for(Tuple2<Double, Integer> item: jsonList){
@@ -125,6 +124,12 @@ public class HumanBenchmark {
 			}
 		}
 		
+		/**
+		 * Converts a JSON string to Tuple. E.g. request:
+		 * { "medicalid":"Markus", "operationissue":"blablub", "age":54, "gender":"Male", "datetime":"2016-11-03 20:59:28.807", "type":"PreOperation", "times":[412,399,324] }
+		 * @param jsonString
+		 * @return
+		 */
 		public static List<Tuple2<Double, Integer>> getListByJSON(String jsonString){    
 			List<Tuple2<Double, Integer>> retList = new ArrayList<>();
 			try {

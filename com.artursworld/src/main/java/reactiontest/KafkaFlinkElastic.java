@@ -6,7 +6,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.elasticsearch2.ElasticsearchSink;
 import org.apache.flink.streaming.connectors.elasticsearch2.ElasticsearchSinkFunction;
 import org.apache.flink.streaming.connectors.elasticsearch2.RequestIndexer;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer09;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer08;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Requests;
@@ -21,7 +21,7 @@ public class KafkaFlinkElastic {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStream<String> stream = readFromKafka(env);
         //stream.print();
-        writeToElastic(stream);
+        //writeToElastic(stream);
         // execute program
         env.execute("Viper Flink!");
     }
@@ -31,10 +31,10 @@ public class KafkaFlinkElastic {
         // set up the execution environment
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", "localhost:9092");
-        properties.setProperty("group.id", "test");
+        properties.setProperty("group.id", "reactiontest");
 
         DataStream<String> stream = env.addSource(
-                new FlinkKafkaConsumer09<>("test", new SimpleStringSchema(), properties));
+                new FlinkKafkaConsumer08<>("reactiontest", new SimpleStringSchema(), properties));
         return stream;
     }
 
