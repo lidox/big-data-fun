@@ -198,6 +198,23 @@ public class HumanBenchmark {
 		}
 		return ret;
 	}
+
+	/**
+	 * Get the max user count by build in aggregation functions
+	 * @return a tuple of max reaction time and user count for a specific reaction test
+	 */
+	public Tuple2<Double, Integer> getMaxUserCountByAggregate() {
+		Tuple2<Double, Integer> ret = null;
+		DataSet<Tuple2<Double, Integer>> output = data
+                .max(0)
+                .andMax(1);
+		try {
+			ret = output.collect().get(0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
 	
 
 }
