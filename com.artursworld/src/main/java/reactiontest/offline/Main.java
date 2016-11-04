@@ -36,15 +36,17 @@ public class Main {
 		
 		// metric average
 		double average = human.getAverageReaction();
-		System.err.println("AVG reactionTime = " + average);
+		System.err.println("October AVG reactionTime = " + average); // 297.26
 		
 		// metric average for all the data
 		human.loadDataSetOfAllTime();
 		double averageAll = human.getAverageReaction();
-		System.err.println("Alltime AVG reactionTime = " + averageAll);
+		System.err.println("Alltime AVG reactionTime = " + averageAll); // 283.99
 		
 		// metric median
-		//TODO: 
+		human.loadDataSetOfOctober2016();
+		double median = human.getMedianReactionTime();
+		System.err.println("October Median reactionTime = " + median); // 285.0
 	}
 	
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
+import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -255,5 +256,52 @@ public class HumanBenchmark {
 			out.collect(new Tuple2<Double, Integer>(reactionTimeSum, userCount));
 		}
 		
+	}
+	
+	/**
+	 * 
+	 * Get every reaction time with user count and return tuple
+	 *
+	 */
+	public static class Medianizer implements FlatMapFunction<Tuple2<Double, Integer>, Tuple2<Double, Integer>>{
+
+		private static final long serialVersionUID = 39387247222383551L;
+
+		@Override
+		public void flatMap(Tuple2<Double, Integer> value, Collector<Tuple2<Double, Integer>> out) {
+			
+			int userCount = value.f1;
+			double reactionTime = value.f0;
+			
+			for(int i = 0; i < userCount; i++){
+				out.collect(new Tuple2<Double, Integer>(reactionTime, 1));
+			}
+			
+		}
+		
+	}
+
+	public double getMedianReactionTime() throws Exception {
+		DataSet<Tuple2<Double, Integer>> allReactionTests = data.flatMap(new Medianizer());
+
+		List<Tuple2<Double, Integer>> reactionTimeList = allReactionTests.collect();
+		
+		double median = getMedianByCollection(reactionTimeList);
+		
+		return median;
+	}
+
+	/**
+	 * Get the median by given list
+	 * @param reactionTimeList the list containing reaction times
+	 * @return the median of the reaction times
+	 */
+	private double getMedianByCollection(List<Tuple2<Double, Integer>> reactionTimeList) {
+		double median = 0;
+		if (reactionTimeList.size() % 2 == 0)
+		    median = ((double) reactionTimeList.get(reactionTimeList.size()/2).f0 + (double) reactionTimeList.get(reactionTimeList.size() /2 - 1).f0)/2;
+		else
+		    median = (double) reactionTimeList.get(reactionTimeList.size()/2).f0;
+		return median;
 	}
 }
