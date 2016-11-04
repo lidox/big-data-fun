@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -40,6 +41,54 @@ public class HumanBenchmark {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+	}
+	
+	/**
+	 * Get reaction test count by sum function
+	 * @return the count of all reaction tests
+	 */
+	public int getReactionTestCount(){
+		int count = 0;
+		
+		try {
+			DataSet<Tuple2<Double, Integer>> sumData = data.sum(1);
+			count = sumData.collect().get(0).f1;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return count;
+	}
+	
+	/**
+	 * Get reaction test count by reduce function
+	 * @return the count of all reaction tests
+	 */
+	public int getReactionTestCountByReduce(){
+		int count = 0;
+		
+		try {
+			DataSet<Tuple2<Double, Integer>> sumData = data.reduce(new ReduceFunction<Tuple2<Double,Integer>>() {
+
+				private static final long serialVersionUID = -5937101140633725165L;
+
+				@Override
+				public Tuple2<Double, Integer> reduce(Tuple2<Double, Integer> recent,Tuple2<Double, Integer> current) {
+					Tuple2<Double, Integer> ret = new Tuple2<Double, Integer>(0.,0);
+					try {
+						ret = new Tuple2<Double, Integer>(current.f0, recent.f1 + current.f1);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					return ret;
+				}
+			});
+			count = sumData.collect().get(0).f1;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return count;
 	}
 
 	/**
