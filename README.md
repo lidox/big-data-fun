@@ -56,7 +56,7 @@ start-all.sh
 
 ## Start Kafka
 ```
-cd kafka_2.10-0.8.2.1
+cd /opt/kafka_2.10-0.8.2.1
 
 # start zookeeper server
 ./bin/zookeeper-server-start.sh ./config/zookeeper.properties
@@ -65,13 +65,13 @@ cd kafka_2.10-0.8.2.1
 ./bin/kafka-server-start.sh ./config/server.properties 
 
 # create topic “test”
- ./bin/kafka-topics.sh --create --topic test --zookeeper localhost:2181 --partitions 1 --replication-factor 1
+ ./bin/kafka-topics.sh --create --topic reactiontest --zookeeper localhost:2181 --partitions 1 --replication-factor 1
 
 # consume from the topic using the console producer
-./bin/kafka-console-consumer.sh --topic test --zookeeper localhost:2181
+./bin/kafka-console-consumer.sh --topic reactiontest --zookeeper localhost:2181
 
 # produce something into the topic (write something and hit enter)
-./bin/kafka-console-producer.sh --topic test --broker-list localhost:9092
+./bin/kafka-console-producer.sh --topic reactiontest --broker-list localhost:9092
 ```
 ## Start ElasticSearch
 ```
