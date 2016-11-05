@@ -9,6 +9,7 @@ import java.util.Properties;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple7;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer08;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
@@ -16,6 +17,17 @@ import org.apache.flink.util.Collector;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
+/**
+ * {
+	"medicalid":"Markus",
+	"operationissue":"foobar",
+	"age":54,
+	"gender":"Male",
+	"datetime":"2016-11-03 20:59:28.807",
+	"type":"PreOperation",
+	"times":[412,399,324]
+}
+ */
 public class ReactionTestStream {
 	
     // configuration
@@ -28,16 +40,19 @@ public class ReactionTestStream {
 	
 	// stream processing
     private StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-    private DataStream<String> textStream = null;
+    private DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data = null; 
+    
+    // metrics
+    private OnlineMetrics metrics = new OnlineMetrics();
     
 	/**
 	 * Initializes a Kafka consumer
 	 * @throws Exception 
 	 */
 	public void initKafkaConsumer() throws Exception {
-		textStream = readFromKafka(env);
+		DataStream<String> textStream = readFromKafka(env);
 
-		textStream.flatMap(new FlatMapFunction<String, Tuple7<String, String, Integer, String, Date, String, List<Double>>>() {
+		this.data = textStream.flatMap(new FlatMapFunction<String, Tuple7<String, String, Integer, String, Date, String, List<Double>>>() {
 	    	
 		    private static final long serialVersionUID = 368385747690202L;
 
@@ -50,17 +65,6 @@ public class ReactionTestStream {
 			public Tuple7<String, String, Integer, String, Date, String, List<Double>> getTupleByJSON(String jsonString){    
 				
 				try {
-					/**
-					 * {
-						"medicalid":"Markus",
-						"operationissue":"blablub",
-						"age":54,
-						"gender":"Male",
-						"datetime":"2016-11-03 20:59:28.807",
-						"type":"PreOperation",
-						"times":[412,399,324]
-					}
-					 */
 					JSONObject request = new JSONObject(jsonString);
 					String medicalid = request.getString("medicalid"); 
 					String operationissue = request.getString("operationissue"); 
@@ -85,7 +89,9 @@ public class ReactionTestStream {
 			}
 
 
-		    }).print();
+		    });
+		
+		data.print();
 		
 		env.execute();
 	}
@@ -99,5 +105,9 @@ public class ReactionTestStream {
         DataStream<String> stream = env.addSource(new FlinkKafkaConsumer08<>(KAFKA_TOPIC_GROUP_ID, new SimpleStringSchema(), properties));
         return stream;
     }
+
+	public int getCount() {
+		return metrics.getCount(data);
+	}
 
 }
