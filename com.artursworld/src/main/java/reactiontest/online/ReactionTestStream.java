@@ -9,8 +9,8 @@ import java.util.Properties;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple7;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer08;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import org.apache.flink.util.Collector;
@@ -90,10 +90,6 @@ public class ReactionTestStream {
 
 
 		    });
-		
-		data.print();
-		
-		env.execute();
 	}
 	
     public DataStream<String> readFromKafka(StreamExecutionEnvironment env) {
@@ -106,8 +102,20 @@ public class ReactionTestStream {
         return stream;
     }
 
-	public int getCount() {
-		return metrics.getCount(data);
+    /**
+     * Calculate the count of reaction tests
+     */
+	public void printCount(Time time) {
+		metrics.setTimeWindow(time);  
+		metrics.getCount(data).print();
 	}
+	
+ 	public void print(){
+		data.print();
+ 	}
+ 	
+ 	public void execute() throws Exception{
+ 		env.execute();
+ 	}
 
 }
