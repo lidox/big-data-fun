@@ -39,6 +39,26 @@ How to use the [Flink elasticsearch connector](https://ci.apache.org/projects/fl
 
 [ElasticSearch Flink and Kafka](https://github.com/keiraqz/KafkaFlinkElastic)
 
+### Configure Elasticsearch
+First create an index:
+```
+# create reactiontest index
+curl -XPUT 'http://localhost:9200/reactiontest/' -d '{
+    "settings" : {
+        "index" : {
+            "number_of_shards" : 1, 
+            "number_of_replicas" : 0
+        }
+    }
+}'
+```
+Make sure you created the index by following message: {"acknowledged":true}
+
+Now create a mapping
+```
+
+```
+
 # Demo
 ## Run Hadoop 2.6.0
 ```
