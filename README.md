@@ -39,6 +39,26 @@ How to use the [Flink elasticsearch connector](https://ci.apache.org/projects/fl
 
 [ElasticSearch Flink and Kafka](https://github.com/keiraqz/KafkaFlinkElastic)
 
+### Configure Elasticsearch
+First create an index:
+```
+# create reactiontest index
+curl -XPUT 'http://localhost:9200/reactiontest/' -d '{
+    "settings" : {
+        "index" : {
+            "number_of_shards" : 1, 
+            "number_of_replicas" : 0
+        }
+    }
+}'
+```
+Make sure you created the index by following message: {"acknowledged":true}
+
+Now create a mapping
+```
+
+```
+
 # Demo
 ## Run Hadoop 2.6.0
 ```
@@ -73,6 +93,10 @@ cd /opt/kafka_2.10-0.8.2.1
 # produce something into the topic (write something and hit enter)
 ./bin/kafka-console-producer.sh --topic reactiontest --broker-list localhost:9092
 ```
+Producer message:
+```
+{"medicalid":"Markus", "operationissue":"foobar", "age":54, "gender":"Male", "datetime":"2016-11-03 20:59:28.807", "type":"PreOperation", "times":[412,399,324] }
+```
 ## Start ElasticSearch
 ```
 cd /Dokumente/elasticsearch-2.3.4/bin
@@ -82,5 +106,21 @@ cd /Dokumente/elasticsearch-2.3.4/bin
 
 # make a search
 curl 'localhost:9200/viper-test/viper-log/_search?regina'
+
+```
+
+## Ubuntu tricks
+```
+sudo nano /usr/local/bin/bigdata
+
+#!/bin/sh
+/home/lidox/Dokumente/elasticsearch-2.3.4/bin/elasticsearch --cluster.name my-demo --node.name my-node &
+
+/opt/kafka_2.10-0.8.2.1/bin/zookeeper-server-start.sh ./config/zookeeper.properties &
+
+/opt/kafka_2.10-0.8.2.1/bin/kafka-server-start.sh ./config/server.properties &
+
+sudo chmod +x /usr/local/bin/bigdata
+sudo netstat -nlp
 
 ```
