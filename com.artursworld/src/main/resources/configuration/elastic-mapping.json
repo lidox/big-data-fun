@@ -1,0 +1,49 @@
+# create reactiontest index
+curl -XPUT 'http://localhost:9200/reactiontest/' -d '{
+    "settings" : {
+        "index" : {
+            "number_of_shards" : 1, 
+            "number_of_replicas" : 0
+        }
+    }
+}'
+# {"acknowledged":true}
+
+# put mapping for viper-log doctype
+curl -XPUT 'localhost:9200/reactiontest/_mapping/reactiontest-log' -d '{
+      "properties": {
+            "medicalid": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "operationissue": {
+                "type": "string"
+            },
+            "age": {
+               "type": "integer"
+             },
+            "gender": {
+               "type": "string"
+            },
+            "datetime": {
+               "type": "string"
+            },
+            "type": {
+               "type": "string"
+            },
+            "times": {
+                "type":"integer",
+                "store":"yes"
+            }
+      }
+}'
+
+ {
+	"medicalid":"Markus",
+	"operationissue":"foobar",
+	"age":54,
+	"gender":"Male",
+	"datetime":"2016-11-03 20:59:28.807",
+	"type":"PreOperation",
+	"times":[412,399,324]
+}

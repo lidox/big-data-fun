@@ -1,5 +1,7 @@
 package reactiontest.online;
 
+import java.net.UnknownHostException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,7 +17,10 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer08;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import org.apache.flink.util.Collector;
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+
+import reactiontest.elastic.ElasticSearch;
 
 /**
  {
@@ -31,16 +36,16 @@ import org.codehaus.jettison.json.JSONObject;
 public class ReactionTestStream {
 	
     // configuration
-    private static String KAFKA_SERVER_DOMAIN = "localhost"; 
-    private static String KAFKA_SERVER_PORT = "9092"; 
-    private static String KAFKA_TOPIC_GROUP_ID = "reactiontest"; 
+	public static String KAFKA_SERVER_DOMAIN = "localhost"; 
+    public static String KAFKA_SERVER_PORT = "9092"; 
+    public static String KAFKA_TOPIC_GROUP_ID = "reactiontest"; 
     
-    private static String ZOOKEEPER_SERVER_PORT = "2181"; 
-    private static String ZOOKEEPER_SERVER_DOMAIN = "localhost";
+    public static String ZOOKEEPER_SERVER_PORT = "2181"; 
+    public static String ZOOKEEPER_SERVER_DOMAIN = "localhost";
 	
 	// stream processing
-    private StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-    private DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data = null; 
+    public StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+    public DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data = null; 
     
     // metrics
     private OnlineMetrics metrics = new OnlineMetrics();
@@ -67,38 +72,11 @@ public class ReactionTestStream {
 
 			@Override
 			public void flatMap(String jsonString, Collector<Tuple7<String, String, Integer, String, Date, String, List<Double>>> out) throws Exception {
-				Tuple7<String, String, Integer, String, Date, String, List<Double>> jsonTuple = getTupleByJSON(jsonString); 
+				Tuple7<String, String, Integer, String, Date, String, List<Double>> jsonTuple = getTupleByJSON2(jsonString); 
 				out.collect(jsonTuple);
 			}
-			
-			public Tuple7<String, String, Integer, String, Date, String, List<Double>> getTupleByJSON(String jsonString){    
-				
-				try {
-					JSONObject request = new JSONObject(jsonString);
-					String medicalid = request.getString("medicalid"); 
-					String operationissue = request.getString("operationissue"); 
-					int age = Integer.parseInt(request.getString("age")); 
-					String gender = request.getString("gender"); 
-					Date datetime = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss.SSS").parse(request.getString("datetime")); 
-					String type = request.getString("type"); 
-					JSONArray timesArray = request.getJSONArray("times"); 
-					List<Double> times = new ArrayList<Double>();
-					for(int i = 0; i < timesArray.length(); i++){
-						times.add(Double.parseDouble(timesArray.getString(i)));
-					}
-						
-					return new Tuple7<String, String, Integer, String, Date, String, List<Double>>(
-							medicalid,operationissue,age,gender,datetime,type,times);
-						
-					
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				return new Tuple7<String, String, Integer, String, Date, String, List<Double>>();
-			}
 
-
-		    });
+		});
 	}
 	
     public DataStream<String> readFromKafka(StreamExecutionEnvironment env) {
@@ -142,6 +120,42 @@ public class ReactionTestStream {
 	public void printMinMaxByTimeWindow(Time time, int value) {
 		metrics.setTimeWindow(time);  
 		metrics.getMinMaxReactionTimeByTimeWindow(data,value).print();
+	}
+
+	/**
+	 * Reads a DataStream<String> from Kafka and sinks it
+	 * @throws UnknownHostException
+	 */
+	public void sink() throws Exception {
+		ElasticSearch elastic = new ElasticSearch();
+        DataStream<String> stream = readFromKafka(env);
+		elastic.writeToElastic(stream);
+		stream.print();
+		env.execute();
+	}
+	
+	public static Tuple7<String, String, Integer, String, Date, String, List<Double>> getTupleByJSON2(
+			String jsonString)  {
+		try {
+		JSONObject request = new JSONObject(jsonString);
+		String medicalid = request.getString("medicalid"); 
+		String operationissue = request.getString("operationissue"); 
+		int age = Integer.parseInt(request.getString("age")); 
+		String gender = request.getString("gender"); 
+		Date datetime = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss.SSS").parse(request.getString("datetime")); 
+		String type = request.getString("type"); 
+		JSONArray timesArray = request.getJSONArray("times"); 
+		List<Double> times = new ArrayList<Double>();
+		for(int i = 0; i < timesArray.length(); i++){
+			times.add(Double.parseDouble(timesArray.getString(i)));
+		}
+			
+		return new Tuple7<String, String, Integer, String, Date, String, List<Double>>(
+				medicalid,operationissue,age,gender,datetime,type,times);			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new Tuple7<String, String, Integer, String, Date, String, List<Double>>();		
+		}
 	}
 
 }

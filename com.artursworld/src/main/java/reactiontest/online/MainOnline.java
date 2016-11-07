@@ -1,13 +1,18 @@
 package reactiontest.online;
 
-import kafka.Kafka;
-
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.kafka.common.metrics.stats.Min;
 
 public class MainOnline {
 
 	public static void main(String[] args) throws Exception {
+		//runOfflineAnalysis();
+		
+		ReactionTestStream stream = new ReactionTestStream();
+		stream.sink();
+		
+	}
+
+	public static void runOfflineAnalysis() throws Exception {
 		ReactionTestStream stream = new ReactionTestStream();
 		stream.initKafkaConsumer();
 		
