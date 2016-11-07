@@ -95,7 +95,7 @@ cd /opt/kafka_2.10-0.8.2.1
 ```
 Producer message:
 ```
-{ "medicalid":"Markus", "operationissue":"foobar", "age":54, "gender":"Male", "datetime":"2016-11-03 20:59:28.807", "type":"PreOperation", "times":[412,399,324] }
+{"medicalid":"Markus", "operationissue":"foobar", "age":54, "gender":"Male", "datetime":"2016-11-03 20:59:28.807", "type":"PreOperation", "times":[412,399,324] }
 ```
 ## Start ElasticSearch
 ```
