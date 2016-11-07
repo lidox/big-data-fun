@@ -18,7 +18,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
- * {
+ {
 	"medicalid":"Markus",
 	"operationissue":"foobar",
 	"age":54,
@@ -45,6 +45,15 @@ public class ReactionTestStream {
     // metrics
     private OnlineMetrics metrics = new OnlineMetrics();
     
+    
+ 	public void print(){
+		data.print();
+ 	}
+ 	
+ 	public void execute() throws Exception{
+ 		env.execute();
+ 	}
+ 	
 	/**
 	 * Initializes a Kafka consumer
 	 * @throws Exception 
@@ -104,18 +113,35 @@ public class ReactionTestStream {
 
     /**
      * Calculate the count of reaction tests
+     * @param time the tumbling time window to be used
      */
 	public void printCount(Time time) {
 		metrics.setTimeWindow(time);  
 		metrics.getCount(data).print();
 	}
 	
- 	public void print(){
-		data.print();
- 	}
- 	
- 	public void execute() throws Exception{
- 		env.execute();
- 	}
+	/**
+	 * Calculate the average reaction time
+	 * @param time the tumbling time window to be used
+	 */
+	public void printAverage(Time time) {
+		metrics.setTimeWindow(time);  
+		metrics.getAverageReactionTime(data).print();
+	}
+
+
+	/**
+	 * Prints the median of by the specified time window
+	 * @param seconds
+	 */
+	public void printMedianByTimeWindow(Time time) {
+		metrics.setTimeWindow(time);  
+		metrics.getMedianReactionTime(data).print();
+	}
+
+	public void printMinMaxByTimeWindow(Time time, int value) {
+		metrics.setTimeWindow(time);  
+		metrics.getMinMaxReactionTimeByTimeWindow(data,value).print();
+	}
 
 }

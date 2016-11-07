@@ -5,7 +5,7 @@ import java.util.Properties;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer09;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer08;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 
 /**
@@ -27,7 +27,7 @@ public class Producer {
 	    properties.setProperty("bootstrap.servers", "localhost:9092"); 
 	    //properties.setProperty("bootstrap.servers", "134.99.218.18:443"); 
 	    DataStream<String> stream = env.addSource(new SimpleStringGenerator());
-	    stream.addSink(new FlinkKafkaProducer09<>("flink-demo", new SimpleStringSchema(), properties));
+	    stream.addSink(new FlinkKafkaProducer08<>("flink-demo", new SimpleStringSchema(), properties));
 
 	    env.execute();
 	  }

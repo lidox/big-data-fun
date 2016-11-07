@@ -5,7 +5,7 @@ import java.util.Properties;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer09;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer08;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 
 /**
@@ -18,6 +18,9 @@ import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
  *
  */
 public class Consumer {
+	
+    private static String ZOOKEEPER_SERVER_PORT = "2181"; 
+    private static String ZOOKEEPER_SERVER_DOMAIN = "localhost";
 
 	public static void main(String[] args) throws Exception {
 	    // create execution environment
@@ -25,12 +28,12 @@ public class Consumer {
 
 	    Properties properties = new Properties();
 	    properties.setProperty("bootstrap.servers", "localhost:9092");
-	    //properties.setProperty("bootstrap.servers", "134.99.218.18:443"); 
+	    properties.setProperty("zookeeper.connect", ZOOKEEPER_SERVER_DOMAIN + ":"+ ZOOKEEPER_SERVER_PORT);
 	   
 	    properties.setProperty("group.id", "flink_consumer");
 
-	    DataStream<String> stream = env.addSource(new FlinkKafkaConsumer09<>(
-	        "test", new SimpleStringSchema(), properties) );
+	    DataStream<String> stream = env.addSource(new FlinkKafkaConsumer08<>(
+	        "flink-demo", new SimpleStringSchema(), properties) );
 
 	    stream.map(new MapFunction<String, String>() {
 	    	
