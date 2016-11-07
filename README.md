@@ -104,3 +104,19 @@ cd /Dokumente/elasticsearch-2.3.4/bin
 curl 'localhost:9200/viper-test/viper-log/_search?regina'
 
 ```
+
+## Ubuntu tricks
+```
+sudo nano /usr/local/bin/bigdata
+
+#!/bin/sh
+/home/lidox/Dokumente/elasticsearch-2.3.4/bin/elasticsearch --cluster.name my-demo --node.name my-node &
+
+/opt/kafka_2.10-0.8.2.1/bin/zookeeper-server-start.sh ./config/zookeeper.properties &
+
+/opt/kafka_2.10-0.8.2.1/bin/kafka-server-start.sh ./config/server.properties &
+
+sudo chmod +x /usr/local/bin/bigdata
+sudo netstat -nlp
+
+```
