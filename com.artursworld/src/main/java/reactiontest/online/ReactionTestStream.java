@@ -61,22 +61,10 @@ public class ReactionTestStream {
 	 * Initializes a Kafka consumer
 	 * @throws Exception 
 	 */
-	public void initKafkaConsumer() throws Exception {
+	public DataStream<String> getKafkaStream() throws Exception { 
 		DataStream<String> textStream = readFromKafka(env);
 		this.data = textStream.flatMap(new String2TupleFlatMapFunction());
-		/*
-		this.data = textStream.flatMap(new FlatMapFunction<String, Tuple7<String, String, Integer, String, Date, String, List<Double>>>() {
-	    	
-		    private static final long serialVersionUID = 368385747690202L;
-
-			@Override
-			public void flatMap(String jsonString, Collector<Tuple7<String, String, Integer, String, Date, String, List<Double>>> out) throws Exception {
-				Tuple7<String, String, Integer, String, Date, String, List<Double>> jsonTuple = getTupleByJSON2(jsonString); 
-				out.collect(jsonTuple);
-			}
-
-		});
-		*/
+		return textStream;
 	}
 	
 
@@ -139,14 +127,12 @@ public class ReactionTestStream {
 	 * Reads a DataStream<String> from Kafka and sinks it
 	 * @throws UnknownHostException
 	 */
-	public void sink() throws Exception {
+	public void sinkToElasticSearch() throws Exception {
 		ElasticSearch elastic = new ElasticSearch();
-        //DataStream<String> stream = readFromKafka(env);
-		//elastic.writeToElastic(stream);
-		// stream.print();
 		elastic.writeToElasticSelf(data);
-		data.print();
-		env.execute();
+		System.out.println("SUCCESS sink"); 
+		//data.print();
+		//env.execute();
 	}
 	
 	public static Tuple7<String, String, Integer, String, Date, String, List<Double>> getTupleByJSON2(
@@ -178,12 +164,13 @@ public class ReactionTestStream {
 	 * Reads data from elasticsearch into a DataStream
 	 * @throws Exception
 	 */
-	public void getElasticSearchStream() throws Exception {
+	public DataStream<String> getElasticSearchStream() throws Exception {
 		ElasticSearch elastic = new ElasticSearch(); 
 		DataStream<String> textStream = elastic.getStream(env);
 		this.data = textStream.flatMap(new String2TupleFlatMapFunction());
 		data.print();
 		env.execute();
+		return textStream;
 	}
 
 }

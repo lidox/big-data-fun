@@ -120,7 +120,7 @@ public class ElasticSearch {
 		for(int i = 0; i < maplist.size(); i++){
 			JSONObject obj = new JSONObject(maplist.get(i));
 			StringBuilder sb = deleteBracketsAtArray(obj);
-			retList.add(sb.toString());//maplist.get(i).toString()
+			retList.add(sb.toString());
 		}
 		DataStream<String> textStream = env.fromCollection(retList);
 		return textStream;	
@@ -132,7 +132,7 @@ public class ElasticSearch {
 		StringBuilder tmp = new StringBuilder(sb.toString().substring(a+1));
 		int b = tmp.indexOf("\"");
 		
-		sb.deleteCharAt(a);//8.807","times":"[234.0, 235.0, 564.0, 2
+		sb.deleteCharAt(a);
 		sb.deleteCharAt(a+ b);
 		return sb;
 	}

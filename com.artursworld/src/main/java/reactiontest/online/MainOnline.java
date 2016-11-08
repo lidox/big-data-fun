@@ -5,28 +5,9 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 public class MainOnline {
 
 	public static void main(String[] args) throws Exception {
-		//runOfflineAnalysis();
-		
-		// Get Kafka Stream and sink it to elasticsearch
-		ReactionTestStream stream = new ReactionTestStream();
-		//stream.initKafkaConsumer();
-		//stream.sink();
-		
-		// combine streams
-		stream.getElasticSearchStream();
-		
-		/*
-		DataStream<Integer> someStream = //...
-        DataStream<String> otherStream = //...
 
-		ConnectedStreams<Integer, String> connectedStreams = someStream.connect(otherStream);
-		*/
-		
-	}
-
-	public static void runOfflineAnalysis() throws Exception {
 		ReactionTestStream stream = new ReactionTestStream();
-		stream.initKafkaConsumer();
+		stream.getKafkaStream();
 		
 		//This is a valid request to kafka:
 		//{ "medicalid":"Artur", "operationissue":"no-op", "age":24, "gender":"Male", "datetime":"2016-11-03 20:59:28.807", "type":"PreOperation", "times":[300,200,400,100] }
@@ -49,6 +30,9 @@ public class MainOnline {
 		// print and execute
 		//stream.print();
 		stream.execute();
+		
 	}
+
+
 
 }
