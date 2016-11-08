@@ -1,4 +1,6 @@
 #Elasticsearch Commands
+The [Documentation](https://www.elastic.co/guide/index.html) can befound online.
+User [2.3.X Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/2.3/index.html) for this project.
 
 ###Create an Indexedit
 ```
@@ -43,3 +45,42 @@ curl -XDELETE 'localhost:9200/customer/external/2?pretty'
 ```
 
 ##The Search APIedit
+The REST API for search is accessible from the _search endpoint. This example returns all documents in the bank index:
+```
+curl -XPOST 'localhost:9200/reactiontest/_search?pretty' -d ' { "query": { "match_all": {} } }'
+```
+###
+```
+
+
+```
+###
+```
+
+
+```
+###
+```
+
+
+```
+###
+```
+
+
+```
+###
+```
+
+
+```
+###
+```
+
+
+```
+###
+```
+
+
+```
