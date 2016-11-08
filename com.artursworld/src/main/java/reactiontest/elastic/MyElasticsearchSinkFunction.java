@@ -14,6 +14,7 @@ import org.elasticsearch.client.Requests;
 
 import reactiontest.online.ReactionTestStream;
 
+//TODO: delete
 public class MyElasticsearchSinkFunction implements ElasticsearchSinkFunction<String> {
 
 	private static final long serialVersionUID = 9208617864747734287L;

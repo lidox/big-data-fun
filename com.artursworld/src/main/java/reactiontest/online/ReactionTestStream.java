@@ -128,9 +128,11 @@ public class ReactionTestStream {
 	 */
 	public void sink() throws Exception {
 		ElasticSearch elastic = new ElasticSearch();
-        DataStream<String> stream = readFromKafka(env);
-		elastic.writeToElastic(stream);
-		stream.print();
+        //DataStream<String> stream = readFromKafka(env);
+		//elastic.writeToElastic(stream);
+		// stream.print();
+		elastic.writeToElasticSelf(data);
+		data.print();
 		env.execute();
 	}
 	

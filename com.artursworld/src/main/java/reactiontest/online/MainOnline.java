@@ -8,6 +8,7 @@ public class MainOnline {
 		//runOfflineAnalysis();
 		
 		ReactionTestStream stream = new ReactionTestStream();
+		stream.initKafkaConsumer();
 		stream.sink();
 		
 	}
