@@ -7,9 +7,20 @@ public class MainOnline {
 	public static void main(String[] args) throws Exception {
 		//runOfflineAnalysis();
 		
+		// Get Kafka Stream and sink it to elasticsearch
 		ReactionTestStream stream = new ReactionTestStream();
-		stream.initKafkaConsumer();
-		stream.sink();
+		//stream.initKafkaConsumer();
+		//stream.sink();
+		
+		// combine streams
+		stream.getElasticSearchStream();
+		
+		/*
+		DataStream<Integer> someStream = //...
+        DataStream<String> otherStream = //...
+
+		ConnectedStreams<Integer, String> connectedStreams = someStream.connect(otherStream);
+		*/
 		
 	}
 

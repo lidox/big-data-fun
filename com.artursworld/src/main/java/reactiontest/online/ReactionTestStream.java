@@ -1,7 +1,6 @@
 package reactiontest.online;
 
 import java.net.UnknownHostException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,7 +16,6 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer08;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import org.apache.flink.util.Collector;
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import reactiontest.elastic.ElasticSearch;
@@ -65,7 +63,8 @@ public class ReactionTestStream {
 	 */
 	public void initKafkaConsumer() throws Exception {
 		DataStream<String> textStream = readFromKafka(env);
-
+		this.data = textStream.flatMap(new String2TupleFlatMapFunction());
+		/*
 		this.data = textStream.flatMap(new FlatMapFunction<String, Tuple7<String, String, Integer, String, Date, String, List<Double>>>() {
 	    	
 		    private static final long serialVersionUID = 368385747690202L;
@@ -77,6 +76,20 @@ public class ReactionTestStream {
 			}
 
 		});
+		*/
+	}
+	
+
+	public static class String2TupleFlatMapFunction implements FlatMapFunction<String , Tuple7<String, String, Integer, String, Date, String, List<Double>>>{
+
+		private static final long serialVersionUID = 3465342383902551L;
+
+		@Override
+		public void flatMap(String jsonString, Collector<Tuple7<String, String, Integer, String, Date, String, List<Double>>> out) {
+			Tuple7<String, String, Integer, String, Date, String, List<Double>> jsonTuple = getTupleByJSON2(jsonString); 
+			out.collect(jsonTuple);
+		}
+		
 	}
 	
     public DataStream<String> readFromKafka(StreamExecutionEnvironment env) {
@@ -158,6 +171,19 @@ public class ReactionTestStream {
 			e.printStackTrace();
 			return new Tuple7<String, String, Integer, String, Date, String, List<Double>>();		
 		}
+	}
+	
+
+	/**
+	 * Reads data from elasticsearch into a DataStream
+	 * @throws Exception
+	 */
+	public void getElasticSearchStream() throws Exception {
+		ElasticSearch elastic = new ElasticSearch(); 
+		DataStream<String> textStream = elastic.getStream(env);
+		this.data = textStream.flatMap(new String2TupleFlatMapFunction());
+		data.print();
+		env.execute();
 	}
 
 }
