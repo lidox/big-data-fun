@@ -1,6 +1,6 @@
 #Elasticsearch Commands
 The [Documentation](https://www.elastic.co/guide/index.html) can befound online.
-User [2.3.X Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/2.3/index.html) for this project.
+Use [2.3.X Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/2.3/index.html) for this project.
 
 ###Create an Indexedit
 ```
