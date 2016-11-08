@@ -49,9 +49,9 @@ The REST API for search is accessible from the _search endpoint. This example re
 ```
 curl -XPOST 'localhost:9200/reactiontest/_search?pretty' -d ' { "query": { "match_all": {} } }'
 ```
-###
+### Search without ID
 ```
-
+curl -XGET 'http://localhost:9200/reactiontest/_search?q=medicalid:Donald'
 
 ```
 ###
