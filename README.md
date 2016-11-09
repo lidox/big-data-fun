@@ -59,6 +59,16 @@ Now create a mapping
 
 ```
 
+## Install Kibana 4.5.1
+First download [Kibana 4.5.1](https://www.elastic.co/downloads/past-releases/kibana-4-5-1). 
+Otherwise use the terminal
+```
+wget "https://download.elastic.co/kibana/kibana/kibana_4.5.1_amd64.deb"
+```
+To install use:
+```
+sudo dpkg -i kibana_4.5.1_amd64.deb
+```
 # Demo
 ## Run Hadoop 2.6.0
 ```
@@ -108,8 +118,14 @@ cd /Dokumente/elasticsearch-2.3.4/bin
 curl 'localhost:9200/viper-test/viper-log/_search?regina'
 
 ```
+## Start Kibana
+```
+cd /otp/kibana/bin
+sudo ./kibana
+```
+Now check [the browser](http://localhost:5601)
 
-## Ubuntu tricks
+### Creating start script: Ubuntu tricks
 ```
 sudo nano /usr/local/bin/bigdata
 
