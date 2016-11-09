@@ -232,7 +232,7 @@ public class OnlineMetrics {
 	
 	/**
 	 * 
-	 * Return tuple<message, prediction, real value>
+	 * Return tuple<message, prediction>
 	 *
 	 */
 	public static class PedictionByAVGFlatMap implements FlatMapFunction<Tuple2<Double, String>, Tuple2<String, Double>>{
@@ -246,10 +246,43 @@ public class OnlineMetrics {
 
 		@Override
 		public void flatMap(Tuple2<Double, String> in, Collector<Tuple2<String, Double>> out) {
-			
 			double onlineAVG = in.f0;
 			double prediction = (offlineAVG + onlineAVG) / 2; 			
-			out.collect(new Tuple2<String, Double>("Prediction for next RT",prediction));
+			out.collect(new Tuple2<String, Double>("Prediction by AVG.  Next RT will be",prediction));
+		}
+		
+	}
+
+
+	public SingleOutputStreamOperator<Tuple2<String, Double>> getPredictedReactionTimeByMedians(
+			DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data,
+			double median) {
+	    return data.keyBy(4) 
+			.timeWindow(TIME_WINDOW)
+			.apply(new MedianWindowFunction()) 
+			.keyBy(0)
+			.flatMap(new PedictionByMedianFlatMap(median));
+	}
+	
+	/**
+	 * AVG of Medians
+	 * Return tuple<message, prediction>
+	 *
+	 */
+	public static class PedictionByMedianFlatMap implements FlatMapFunction<Tuple3<Double, String, Integer>, Tuple2<String, Double>>{
+
+		private static final long serialVersionUID = 72346547222383551L;
+		private  double offlineMedian = 0;
+		
+		PedictionByMedianFlatMap(double offlineMedian){
+			this.offlineMedian = offlineMedian;
+		}
+
+		@Override
+		public void flatMap(Tuple3<Double, String, Integer> in, Collector<Tuple2<String, Double>> out) {
+			double onlineMedian = in.f0;
+			double prediction = (offlineMedian + onlineMedian) / 2; 			
+			out.collect(new Tuple2<String,Double>("Prediction by AVG of Median. NEXT RT:", prediction)); 
 		}
 		
 	}

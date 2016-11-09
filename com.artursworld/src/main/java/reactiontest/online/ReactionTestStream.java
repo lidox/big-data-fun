@@ -178,4 +178,9 @@ public class ReactionTestStream {
 		metrics.getPredictedReactionTimeByAVGs(data, average).print();
 	}
 
+	public void printPredictionForNextReactionTimeByMedians(double median,Time time) {
+		metrics.setTimeWindow(time);  
+		metrics.getPredictedReactionTimeByMedians(data, median).print();
+	}
+
 }
