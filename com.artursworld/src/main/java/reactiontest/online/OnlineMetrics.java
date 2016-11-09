@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -83,6 +84,7 @@ public class OnlineMetrics {
 	
 	/**
 	 * Calculates the average reaction time in the specified window
+	 * Returns a tuple<avg, timeStamp>
 	 */
 	public static class AverageWindowFunction implements WindowFunction<Tuple7<String, String, Integer, String, Date, String, List<Double>> 
 	, Tuple2<Double, String>, Tuple, TimeWindow>{
@@ -110,8 +112,7 @@ public class OnlineMetrics {
 			for(Double reactionTime: reactionTimeList){
 				reactioTimeSum += reactionTime;
 			}
-				
-				
+						
 			double avg = 0;
 			
 			if(reactionTimeCount != 0)
@@ -209,6 +210,46 @@ public class OnlineMetrics {
 			
 		    // Tuple3 = minimum/maximum ,timeStamp, test count
 			out.collect(new Tuple3<Double, String, Integer>(reactionTimeList.get(index), new Date().toString(), reactionTimeList.size()));
+		}
+		
+	}
+
+ 
+	/**
+	 * Make prediction
+	 * @param data
+	 * @param avg
+	 * @return
+	 */
+	public SingleOutputStreamOperator<Tuple2<String, Double>> getPredictedReactionTimeByAVGs(
+			DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data, double avg) {
+		    return data.keyBy(4) // group by timeStamp
+				.timeWindow(TIME_WINDOW)
+				.apply(new AverageWindowFunction()) 
+				.keyBy(0)
+				.flatMap(new PedictionByAVGFlatMap(avg));
+	}
+	
+	/**
+	 * 
+	 * Return tuple<message, prediction, real value>
+	 *
+	 */
+	public static class PedictionByAVGFlatMap implements FlatMapFunction<Tuple2<Double, String>, Tuple2<String, Double>>{
+
+		private static final long serialVersionUID = 71246547222383551L;
+		private  double offlineAVG = 0;
+		
+		PedictionByAVGFlatMap(double avg){
+			offlineAVG = avg;
+		}
+
+		@Override
+		public void flatMap(Tuple2<Double, String> in, Collector<Tuple2<String, Double>> out) {
+			
+			double onlineAVG = in.f0;
+			double prediction = (offlineAVG + onlineAVG) / 2; 			
+			out.collect(new Tuple2<String, Double>("Prediction for next RT",prediction));
 		}
 		
 	}

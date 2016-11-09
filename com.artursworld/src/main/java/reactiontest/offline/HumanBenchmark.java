@@ -25,11 +25,7 @@ public class HumanBenchmark {
 	DataSet<Tuple2<Double, Integer>> data = null;
 	
 	public HumanBenchmark() {
-		try {		
-			env = ExecutionEnvironment.getExecutionEnvironment();
-		} catch(Exception e) {
-			  e.printStackTrace();
-		}
+		env = ExecutionEnvironment.getExecutionEnvironment();
 	}
 	
 	public void loadDataSetOfAllTime(){

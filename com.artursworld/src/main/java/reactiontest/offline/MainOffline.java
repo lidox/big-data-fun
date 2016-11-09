@@ -6,7 +6,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
  * Offline data analysis
  *
  */
-public class Main {
+public class MainOffline {
 	
 	public static void main(String[] args) throws Exception {
 		

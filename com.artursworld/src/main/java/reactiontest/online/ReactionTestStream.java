@@ -173,4 +173,9 @@ public class ReactionTestStream {
 		return textStream;
 	}
 
+	public void printPredictionFOrNextReactionTimeByAVGs(double average, Time time) {
+		metrics.setTimeWindow(time);  
+		metrics.getPredictedReactionTimeByAVGs(data, average).print();
+	}
+
 }
