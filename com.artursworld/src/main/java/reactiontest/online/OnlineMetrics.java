@@ -286,5 +286,21 @@ public class OnlineMetrics {
 		}
 		
 	}
+
+
+	public SingleOutputStreamOperator<Tuple1<Integer>> getAverageReactionTimeBySlidingWindow(
+			DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data,
+			Time slideTime) {
+		return data.keyBy(0)
+				.timeWindow(TIME_WINDOW, slideTime)
+				.apply(new Counter());
+	}
 	
+	public SingleOutputStreamOperator<Tuple1<Integer>> getCount(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data, Time slideTime) {
+		return data.keyBy(0)
+				.timeWindow(TIME_WINDOW, slideTime)
+				.apply(new Counter());
+	}
+	
+
 }

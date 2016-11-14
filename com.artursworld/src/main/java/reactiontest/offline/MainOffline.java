@@ -16,7 +16,7 @@ public class MainOffline {
 		
 		human.printInputData();
 		
-		// metric: count using flinks sum function
+		// metric: count using links sum function
 		System.err.println("1. RT Count: "+human.getReactionTestCountBySum()); 
 		
 		// metric: count using flinks reduce function

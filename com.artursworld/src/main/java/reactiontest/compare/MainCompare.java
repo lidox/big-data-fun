@@ -24,7 +24,7 @@ public class MainCompare {
 		printPredictionByAverage();
 		
 		// Prediction 2:
-		printPredictionByAVGofMedians();
+		//printPredictionByAVGofMedians();
 		
 		// Prediction 3:
 		//TODO:
@@ -60,7 +60,7 @@ public class MainCompare {
 	}
 
 	private static void printPredictionByAverage() throws Exception {
-		// Pediction 1: avg off all reaction data + last 5 online (thumbeling window)
+		// Prediction 1: Average off October 2016 reaction data + tumbling window
 		HumanBenchmark human = new HumanBenchmark();
 		human.loadDataSetOfOctober2016();
 		double average = human.getAverageReaction();

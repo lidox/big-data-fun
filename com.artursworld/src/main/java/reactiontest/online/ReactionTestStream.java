@@ -183,4 +183,10 @@ public class ReactionTestStream {
 		metrics.getPredictedReactionTimeByMedians(data, median).print();
 	}
 
+	public void printCount(Time time, Time slideTime) {
+		metrics.setTimeWindow(time);  
+		metrics.getCount(data, slideTime).print();
+		
+	}
+
 }
