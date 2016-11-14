@@ -21,28 +21,14 @@ public class MainCompare {
 		
 		
 		// Prediction 1:
-		printPredictionByAverage();
+		//printPredictionByAverage();
 		
 		// Prediction 2:
 		//printPredictionByAVGofMedians();
 		
 		// Prediction 3:
-		//TODO:
+		printPredictionBySlidingAverage();
 		
-		
-		// Get Kafka Stream and sink it to elasticsearch
-		//ReactionTestStream stream = new ReactionTestStream();
-		
-		//DataStream<String> kafkaStream = stream.getKafkaStream(); 
-		//stream.sinkToElasticSearch(); // sink kafkaStream to elastic
-		
-		// combine streams
-		//DataStream<String> esStream = stream.getElasticSearchStream();
-		
-		//ConnectedStreams<String, String> connectedStreams = kafkaStream.connect(esStream);
-
-		
-
 	}
 
 	private static void printPredictionByAVGofMedians() throws Exception {
@@ -69,7 +55,21 @@ public class MainCompare {
 		ReactionTestStream stream = new ReactionTestStream();
 		//START KAFKA Broker and Zookeeper
 		stream.getKafkaStream();
-		stream.printPredictionFOrNextReactionTimeByAVGs(average, Time.seconds(10));
+		stream.printPredictionForNextReactionTimeByAVGs(average, Time.seconds(10));
+		stream.execute();
+	}
+	
+	private static void printPredictionBySlidingAverage() throws Exception {
+		// Prediction 1: Average off October 2016 reaction data + tumbling window
+		HumanBenchmark human = new HumanBenchmark();
+		human.loadDataSetOfOctober2016();
+		double average = human.getAverageReaction();
+		
+		
+		ReactionTestStream stream = new ReactionTestStream();
+		//START KAFKA Broker and Zookeeper
+		stream.getKafkaStream();
+		stream.printPredictionForNextReactionTimeBySlidingAVGs(average, Time.seconds(10), Time.seconds(3));
 		stream.execute();
 	}
 

@@ -230,6 +230,16 @@ public class OnlineMetrics {
 				.flatMap(new PedictionByAVGFlatMap(avg));
 	}
 	
+
+	public SingleOutputStreamOperator<Tuple2<String, Double>> getPredictedReactionTimeBySlidingAVGs(
+			DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data, double avg, Time slide) {
+		    return data.keyBy(4) // group by timeStamp
+				.timeWindow(TIME_WINDOW, slide)
+				.apply(new AverageWindowFunction()) 
+				.keyBy(0)
+				.flatMap(new PedictionByAVGFlatMap(avg));
+	}
+	
 	/**
 	 * 
 	 * Return tuple<message, prediction>

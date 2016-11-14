@@ -173,7 +173,7 @@ public class ReactionTestStream {
 		return textStream;
 	}
 
-	public void printPredictionFOrNextReactionTimeByAVGs(double average, Time time) {
+	public void printPredictionForNextReactionTimeByAVGs(double average, Time time) {
 		metrics.setTimeWindow(time);  
 		metrics.getPredictedReactionTimeByAVGs(data, average).print();
 	}
@@ -185,8 +185,12 @@ public class ReactionTestStream {
 
 	public void printCount(Time time, Time slideTime) {
 		metrics.setTimeWindow(time);  
-		metrics.getCount(data, slideTime).print();
-		
+		metrics.getCount(data, slideTime).print();	
+	}
+	
+	public void printPredictionForNextReactionTimeBySlidingAVGs(double average, Time time, Time slide) {
+		metrics.setTimeWindow(time);  
+		metrics.getPredictedReactionTimeBySlidingAVGs(data, average, slide).print();
 	}
 
 }
