@@ -30,6 +30,20 @@ https://archive.apache.org/dist/hadoop/core/hadoop-2.6.0/
 ## Connect Kafka with HDFS
 https://www.youtube.com/watch?v=imDtlYXpRgc
 
+## Run Hadoop 2.6.0
+```
+cd /usr/local/hadoop/sbin
+
+sudo su hduser
+
+start-all.sh
+```
+
+## Monitoring Hadoop
+[Web UI of the NameNode daemon](http://localhost:50070)
+
+[Logs](http://localhost:50070/logs/)
+
 ## Elastic Search 
 How to [setup](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html) elastic search. Try [Ubuntu installation guide] (https://www.elastic.co/guide/en/elasticsearch/reference/current/deb.html). 
 
@@ -70,19 +84,6 @@ To install use:
 sudo dpkg -i kibana_4.5.1_amd64.deb
 ```
 # Demo
-## Run Hadoop 2.6.0
-```
-cd /usr/local/hadoop/sbin
-
-sudo su hduser
-
-start-all.sh
-```
-
-## Monitoring Hadoop
-[Web UI of the NameNode daemon](http://localhost:50070)
-
-[Logs](http://localhost:50070/logs/)
 
 ## Start Kafka
 ```
@@ -125,7 +126,9 @@ sudo ./kibana
 ```
 Now check [the browser](http://localhost:5601)
 
-### Creating start script: Ubuntu tricks
+# Additional stuff
+To make things easier you could create a start script for
+all tools used like Hadoop, ElasticSearch, Kibana, Kafka etc.
 ```
 sudo nano /usr/local/bin/bigdata
 
