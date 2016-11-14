@@ -74,7 +74,7 @@ The data can be visualized via Eclipse Console and [Kibana](https://www.elastic.
 In order to demonstrate the function Eclipse will be used.
 
 ## 8. Prepare the demo submission 
-That's what this document stands for! :)
+To prepare the tools used in this project see following [DEMO](https://github.com/lidox/big-data-fun/blob/master/README.md#demo)
 
 ## 9. Solve various bugs that appear along the way - 3 hours (10% of the workload :) )
 ```java
