@@ -21,10 +21,10 @@ public class MainCompare {
 		
 		
 		// Prediction 1:
-		//printPredictionByAverage();
+		printPredictionByAverage();
 		
 		// Prediction 2:
-		//printPredictionByAVGofMedians();
+		printPredictionByAVGofMedians();
 		
 		// Prediction 3:
 		printPredictionBySlidingAverage();
@@ -67,7 +67,6 @@ public class MainCompare {
 		
 		
 		ReactionTestStream stream = new ReactionTestStream();
-		//START KAFKA Broker and Zookeeper
 		stream.getKafkaStream();
 		stream.printPredictionForNextReactionTimeBySlidingAVGs(average, Time.seconds(10), Time.seconds(3));
 		stream.execute();
