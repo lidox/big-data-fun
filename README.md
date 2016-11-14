@@ -1,7 +1,7 @@
 # Big Data Fun
 
-## Prepare and Installation Guides
-See following [instructions ](https://gist.github.com/lidox/ae71fe107792534cc13cd887175dede4) to prepare our tools and data
+## Preparetion and Installation Guides
+See following [instructions ](https://gist.github.com/lidox/ae71fe107792534cc13cd887175dede4) to prepare your machine installing MAVEN, Java etc.
 
 ## Get familiar with Apache Flink
 
@@ -23,14 +23,28 @@ See folling [blog article](http://www.vogella.com/tutorials/AndroidBuildMaven/ar
 Download:
 https://archive.apache.org/dist/hadoop/core/hadoop-2.6.0/
 
-## Install:
+#### Install:
 1. [Best guide](http://www.bogotobogo.com/Hadoop/BigData_hadoop_Install_on_ubuntu_single_node_cluster.php)
 2. [Good guide](http://pingax.com/install-hadoop2-6-0-on-ubuntu)
 
-## Connect Kafka with HDFS
+#### Connect Kafka with HDFS
 https://www.youtube.com/watch?v=imDtlYXpRgc
 
-## Elastic Search 
+#### Run Hadoop 2.6.0
+```
+cd /usr/local/hadoop/sbin
+
+sudo su hduser
+
+start-all.sh
+```
+
+#### Monitoring Hadoop
+[Web UI of the NameNode daemon](http://localhost:50070)
+
+[Logs](http://localhost:50070/logs/)
+
+## Get familiar with Elastic Search 
 How to [setup](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html) elastic search. Try [Ubuntu installation guide] (https://www.elastic.co/guide/en/elasticsearch/reference/current/deb.html). 
 
 [ElasticSearch Installation 2.3.2](https://www.elastic.co/guide/en/elasticsearch/reference/2.3/_installation.html)
@@ -39,7 +53,7 @@ How to use the [Flink elasticsearch connector](https://ci.apache.org/projects/fl
 
 [ElasticSearch Flink and Kafka](https://github.com/keiraqz/KafkaFlinkElastic)
 
-### Configure Elasticsearch
+#### Configure Elasticsearch
 First create an index:
 ```
 # create reactiontest index
@@ -56,23 +70,49 @@ Make sure you created the index by following message: {"acknowledged":true}
 
 Now create a mapping
 ```
-
+# put mapping for viper-log doctype
+curl -XPUT 'localhost:9200/reactiontest/_mapping/reactiontest-log' -d '{
+      "properties": {
+            "medicalid": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "operationissue": {
+                "type": "string"
+            },
+            "age": {
+               "type": "integer"
+             },
+            "gender": {
+               "type": "string"
+            },
+            "datetime": {
+               "type": "string"
+            },
+            "type": {
+               "type": "string"
+            },
+            "times": {
+                "type":"integer",
+                "store":"yes"
+            }
+      }
+}'
 ```
 
-# Demo
-## Run Hadoop 2.6.0
+## Get familiar with Kibana
+
+#### Install Kibana 4.5.1
+First download [Kibana 4.5.1](https://www.elastic.co/downloads/past-releases/kibana-4-5-1). 
+Otherwise use the terminal
 ```
-cd /usr/local/hadoop/sbin
-
-sudo su hduser
-
-start-all.sh
+wget "https://download.elastic.co/kibana/kibana/kibana_4.5.1_amd64.deb"
 ```
-
-## Monitoring Hadoop
-[Web UI of the NameNode daemon](http://localhost:50070)
-
-[Logs](http://localhost:50070/logs/)
+To install use:
+```
+sudo dpkg -i kibana_4.5.1_amd64.deb
+```
+# DEMO
 
 ## Start Kafka
 ```
@@ -108,8 +148,16 @@ cd /Dokumente/elasticsearch-2.3.4/bin
 curl 'localhost:9200/viper-test/viper-log/_search?regina'
 
 ```
+## Start Kibana
+```
+cd /otp/kibana/bin
+sudo ./kibana
+```
+Now check [the browser](http://localhost:5601)
 
-## Ubuntu tricks
+# Additional stuff
+To make things easier you could create a start script for
+all tools used like Hadoop, ElasticSearch, Kibana, Kafka etc.
 ```
 sudo nano /usr/local/bin/bigdata
 
