@@ -1,9 +1,16 @@
 package reactiontest.compare;
 
+import java.util.Date;
+import java.util.List;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple7;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.windowing.time.Time;
 
-import reactiontest.offline.HumanBenchmark;
-import reactiontest.online.ReactionTestStream;
+import reactiontest.offline.BatchFunctions;
+import reactiontest.online.StreamFunctions;
 
 /**
  * Compare the online statistics with the offline computed statistics 
@@ -34,41 +41,41 @@ public class MainCompare {
 	private static void printPredictionByAVGofMedians() throws Exception {
 		// Prediction 2: Median off all reaction data since October 2016 
 		// and last reaction times specified by tumbling window
-		HumanBenchmark human = new HumanBenchmark();
-		human.loadDataSetOfOctober2016();
-		double median = human.getMedianReactionTime();
+		BatchFunctions batch = new BatchFunctions();
+		DataSet<Tuple2<Double, Integer>> dataSet1 = batch.loadDataSetOfOctober2016();
+		double median = batch.getMedianReactionTime(dataSet1);
 		
 		
-		ReactionTestStream stream = new ReactionTestStream();
-		stream.getKafkaStream();
-		stream.printPredictionForNextReactionTimeByMedians(median, Time.seconds(10));
+		StreamFunctions stream = new StreamFunctions();
+		DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> dataStream1 = stream.getKafkaStream();
+		stream.printPredictionForNextReactionTimeByMedians(dataStream1, median, Time.seconds(10));
 		stream.execute();
 	}
 
 	private static void printPredictionByAverage() throws Exception {
 		// Prediction 1: Average off October 2016 reaction data + tumbling window
-		HumanBenchmark human = new HumanBenchmark();
-		human.loadDataSetOfOctober2016();
-		double average = human.getAverageReaction();
+		BatchFunctions human = new BatchFunctions();
+		DataSet<Tuple2<Double, Integer>> dataSet1 = human.loadDataSetOfOctober2016();
+		double average = human.getAverageReaction(dataSet1);
 		
 		
-		ReactionTestStream stream = new ReactionTestStream();
+		StreamFunctions stream = new StreamFunctions();
 		//START KAFKA Broker and Zookeeper
-		stream.getKafkaStream();
-		stream.printPredictionForNextReactionTimeByAVGs(average, Time.seconds(10));
+		DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> dataStream1 = stream.getKafkaStream();
+		stream.printPredictionForNextReactionTimeByAVGs(dataStream1, average, Time.seconds(10));
 		stream.execute();
 	}
 	
 	private static void printPredictionBySlidingAverage() throws Exception {
 		// Prediction 1: Average off October 2016 reaction data + tumbling window
-		HumanBenchmark human = new HumanBenchmark();
-		human.loadDataSetOfOctober2016();
-		double average = human.getAverageReaction();
+		BatchFunctions human = new BatchFunctions();
+		DataSet<Tuple2<Double, Integer>> dataSet1 = human.loadDataSetOfOctober2016();
+		double average = human.getAverageReaction(dataSet1);
 		
 		
-		ReactionTestStream stream = new ReactionTestStream();
-		stream.getKafkaStream();
-		stream.printPredictionForNextReactionTimeBySlidingAVGs(average, Time.seconds(10), Time.seconds(3));
+		StreamFunctions stream = new StreamFunctions();
+		DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> dataStream1 = stream.getKafkaStream();
+		stream.printPredictionForNextReactionTimeBySlidingAVGs(dataStream1, average, Time.seconds(10), Time.seconds(3));
 		stream.execute();
 	}
 
