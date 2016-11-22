@@ -21,7 +21,7 @@ import org.codehaus.jettison.json.JSONObject;
 import reactiontest.elastic.ElasticSearch;
 
 /**
- {
+{
 	"medicalid":"Markus",
 	"operationissue":"foobar",
 	"age":54,
@@ -30,26 +30,25 @@ import reactiontest.elastic.ElasticSearch;
 	"type":"PreOperation",
 	"times":[412,399,324]
 }
- */
-public class ReactionTestStream {
+*/
+public class StreamFunctions {
 	
     // configuration
 	public static String KAFKA_SERVER_DOMAIN = "localhost"; 
     public static String KAFKA_SERVER_PORT = "9092"; 
     public static String KAFKA_TOPIC_GROUP_ID = "reactiontest"; 
-    
     public static String ZOOKEEPER_SERVER_PORT = "2181"; 
     public static String ZOOKEEPER_SERVER_DOMAIN = "localhost";
 	
 	// stream processing
     public StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-    public DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data = null; 
+    //public DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data = null; 
     
     // metrics
     private OnlineMetrics metrics = new OnlineMetrics();
     
     
- 	public void print(){
+ 	public void print(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data){
 		data.print();
  	}
  	
@@ -61,10 +60,9 @@ public class ReactionTestStream {
 	 * Initializes a Kafka consumer
 	 * @throws Exception 
 	 */
-	public DataStream<String> getKafkaStream() throws Exception { 
+	public DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> getKafkaStream() throws Exception { 
 		DataStream<String> textStream = readFromKafka(env);
-		this.data = textStream.flatMap(new String2TupleFlatMapFunction());
-		return textStream;
+		return textStream.flatMap(new String2TupleFlatMapFunction());
 	}
 	
 
@@ -94,7 +92,7 @@ public class ReactionTestStream {
      * Calculate the count of reaction tests
      * @param time the tumbling time window to be used
      */
-	public void printCount(Time time) {
+	public void printCount(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data, Time time) {
 		metrics.setTimeWindow(time);  
 		metrics.getCount(data).print();
 	}
@@ -103,7 +101,7 @@ public class ReactionTestStream {
 	 * Calculate the average reaction time
 	 * @param time the tumbling time window to be used
 	 */
-	public void printAverage(Time time) {
+	public void printAverage(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data, Time time) {
 		metrics.setTimeWindow(time);  
 		metrics.getAverageReactionTime(data).print();
 	}
@@ -113,12 +111,12 @@ public class ReactionTestStream {
 	 * Prints the median of by the specified time window
 	 * @param seconds
 	 */
-	public void printMedianByTimeWindow(Time time) {
+	public void printMedianByTimeWindow(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data, Time time) {
 		metrics.setTimeWindow(time);  
 		metrics.getMedianReactionTime(data).print();
 	}
 
-	public void printMinMaxByTimeWindow(Time time, int value) {
+	public void printMinMaxByTimeWindow(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data, Time time, int value) {
 		metrics.setTimeWindow(time);  
 		metrics.getMinMaxReactionTimeByTimeWindow(data,value).print();
 	}
@@ -127,7 +125,7 @@ public class ReactionTestStream {
 	 * Reads a DataStream<String> from Kafka and sinks it
 	 * @throws UnknownHostException
 	 */
-	public void sinkToElasticSearch() throws Exception {
+	public void sinkToElasticSearch(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data) throws Exception {
 		ElasticSearch elastic = new ElasticSearch();
 		elastic.writeToElasticSelf(data);
 		System.out.println("SUCCESS sink"); 
@@ -167,28 +165,28 @@ public class ReactionTestStream {
 	public DataStream<String> getElasticSearchStream() throws Exception {
 		ElasticSearch elastic = new ElasticSearch(); 
 		DataStream<String> textStream = elastic.getStream(env);
-		this.data = textStream.flatMap(new String2TupleFlatMapFunction());
-		data.print();
+		//DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> retData = textStream.flatMap(new String2TupleFlatMapFunction());
+		//data.print();
 		env.execute();
 		return textStream;
 	}
 
-	public void printPredictionForNextReactionTimeByAVGs(double average, Time time) {
+	public void printPredictionForNextReactionTimeByAVGs(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data, double average, Time time) {
 		metrics.setTimeWindow(time);  
 		metrics.getPredictedReactionTimeByAVGs(data, average).print();
 	}
 
-	public void printPredictionForNextReactionTimeByMedians(double median,Time time) {
+	public void printPredictionForNextReactionTimeByMedians(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data,double median,Time time) {
 		metrics.setTimeWindow(time);  
 		metrics.getPredictedReactionTimeByMedians(data, median).print();
 	}
 
-	public void printCount(Time time, Time slideTime) {
+	public void printCount(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data,Time time, Time slideTime) {
 		metrics.setTimeWindow(time);  
 		metrics.getCount(data, slideTime).print();	
 	}
 	
-	public void printPredictionForNextReactionTimeBySlidingAVGs(double average, Time time, Time slide) {
+	public void printPredictionForNextReactionTimeBySlidingAVGs(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data,double average, Time time, Time slide) {
 		metrics.setTimeWindow(time);  
 		metrics.getPredictedReactionTimeBySlidingAVGs(data, average, slide).print();
 	}
