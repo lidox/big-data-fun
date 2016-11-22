@@ -13,32 +13,31 @@ import org.apache.flink.util.Collector;
 import org.codehaus.jettison.json.JSONArray;
 
 /**
- * Offline data analysis via Flink. The data is comming from 
+ * Offline data analysis via Apache Flink. The data is comming from 
  * www.humanbenchmark.com/tests/reactiontime
  */
-public class HumanBenchmark {
-	
+public class BatchFunctions { 
 	// configuration
 	private String filePathJSON = "human-benchmark-october.json";
 	
 	private ExecutionEnvironment env = null;
-	DataSet<Tuple2<Double, Integer>> data = null;
+	//DataSet<Tuple2<Double, Integer>> data = null;
 	
-	public HumanBenchmark() {
+	public BatchFunctions() {
 		env = ExecutionEnvironment.getExecutionEnvironment();
 	}
 	
-	public void loadDataSetOfAllTime(){
+	public DataSet<Tuple2<Double, Integer>> loadDataSetOfAllTime(){
 		DataSet<String> inputData = env.readTextFile(getFilePath("human-benchmark-alltime.json"));
-		data = inputData.flatMap(new Tokenizer());
+		return inputData.flatMap(new Tokenizer());
 	}
 	
-	public void loadDataSetOfOctober2016(){
+	public DataSet<Tuple2<Double, Integer>> loadDataSetOfOctober2016(){
 		DataSet<String> inputData = env.readTextFile(getFilePath(filePathJSON));
-		data = inputData.flatMap(new Tokenizer());
+		return inputData.flatMap(new Tokenizer());
 	}
 	
-	public void printInputData(){
+	public void printInputData(DataSet<Tuple2<Double, Integer>> data){
 		if(data != null)
 			try {
 				data.print();
@@ -51,7 +50,7 @@ public class HumanBenchmark {
 	 * Get reaction test count by sum function
 	 * @return the count of all reaction tests
 	 */
-	public int getReactionTestCountBySum(){
+	public int getReactionTestCountBySum(DataSet<Tuple2<Double, Integer>> data){
 		int count = 0;
 		
 		try {
@@ -68,7 +67,7 @@ public class HumanBenchmark {
 	 * Get reaction test count by reduce function
 	 * @return the count of all reaction tests
 	 */
-	public int getReactionTestCountByReduce(){
+	public int getReactionTestCountByReduce(DataSet<Tuple2<Double, Integer>> data){
 		int count = 0;
 		
 		try {
@@ -148,7 +147,7 @@ public class HumanBenchmark {
 	 * Get the reaction time with the minimal user count using the reduce function
 	 * @return the reaction time tuple with the minimal user count
 	 */
-	public Tuple2<Double, Integer> getReactionTimeByMinUserCount() {
+	public Tuple2<Double, Integer> getReactionTimeByMinUserCount(DataSet<Tuple2<Double, Integer>> data) {
 		Tuple2<Double, Integer> ret = new Tuple2<Double, Integer>();
 		try {
 			DataSet<Tuple2<Double, Integer>> minData = data.reduce(new ReduceFunction<Tuple2<Double,Integer>>() {
@@ -180,7 +179,7 @@ public class HumanBenchmark {
 	 * Get the reaction time with the maximal user count using the reduce function
 	 * @return the reaction time tuple with the maximal user count
 	 */
-	public Tuple2<Double, Integer> getReactionTimeByMaxUserCount() {
+	public Tuple2<Double, Integer> getReactionTimeByMaxUserCount(DataSet<Tuple2<Double, Integer>> data) {
 		Tuple2<Double, Integer> ret = new Tuple2<Double, Integer>();
 		try {
 			DataSet<Tuple2<Double, Integer>> maxData = data.reduce(new ReduceFunction<Tuple2<Double,Integer>>() { 
@@ -212,7 +211,7 @@ public class HumanBenchmark {
 	 * Get the max user count by build in aggregation functions
 	 * @return a tuple of max reaction time and user count for a specific reaction test
 	 */
-	public Tuple2<Double, Integer> getMaxUserCountByAggregate() {
+	public Tuple2<Double, Integer> getMaxUserCountByAggregate(DataSet<Tuple2<Double, Integer>> data) {
 		Tuple2<Double, Integer> ret = null;
 		DataSet<Tuple2<Double, Integer>> output = data
                 .max(0)
@@ -230,7 +229,7 @@ public class HumanBenchmark {
 	 * @return the average reaction time 
 	 * @throws Exception
 	 */
-	public double getAverageReaction() throws Exception {
+	public double getAverageReaction(DataSet<Tuple2<Double, Integer>> data) throws Exception {
 		DataSet<Tuple2<Double, Integer>> output = data.flatMap(new Averagenizer());
 		output = output.sum(0).andSum(1);
 		Tuple2<Double, Integer> finalTuple = output.collect().get(0);
@@ -303,7 +302,7 @@ public class HumanBenchmark {
 	}
 	*/
 
-	public double getMedianReactionTime() throws Exception {
+	public double getMedianReactionTime(DataSet<Tuple2<Double, Integer>> data) throws Exception {
 		DataSet<Tuple2<Double, Integer>> allReactionTests = data.flatMap(new Medianizer());
 
 		List<Tuple2<Double, Integer>> reactionTimeList = allReactionTests.collect();
