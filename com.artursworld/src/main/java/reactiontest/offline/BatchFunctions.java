@@ -17,11 +17,8 @@ import org.codehaus.jettison.json.JSONArray;
  * www.humanbenchmark.com/tests/reactiontime
  */
 public class BatchFunctions { 
-	// configuration
-	private String filePathJSON = "human-benchmark-october.json";
 	
 	private ExecutionEnvironment env = null;
-	//DataSet<Tuple2<Double, Integer>> data = null;
 	
 	public BatchFunctions() {
 		env = ExecutionEnvironment.getExecutionEnvironment();
@@ -33,7 +30,7 @@ public class BatchFunctions {
 	}
 	
 	public DataSet<Tuple2<Double, Integer>> loadDataSetOfOctober2016(){
-		DataSet<String> inputData = env.readTextFile(getFilePath(filePathJSON));
+		DataSet<String> inputData = env.readTextFile(getFilePath("human-benchmark-october.json"));
 		return inputData.flatMap(new Tokenizer());
 	}
 	
@@ -312,25 +309,6 @@ public class BatchFunctions {
 		return median;
 	}
 	
-	/*
-	public double getMedian() throws Exception{
-		DataSet<Tuple2<Double, Integer>> data = this.data.flatMap(new Counter());
-
-		data.print();
-		
-		
-		double median = 0;
-		
-		// calculate median
-		int itemCount = dataList.size();
-		if (itemCount % 2 == 0)
-		    median = ((double) dataList.get(itemCount/2).f0 + (double) dataList.get(itemCount /2 - 1).f0)/2;
-		else
-		    median = (double) dataList.get(itemCount/2).f0;
-		
-		return median;
-	}
-	*/
 
 	/**
 	 * Get the median by given list

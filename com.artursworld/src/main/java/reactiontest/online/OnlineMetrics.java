@@ -6,14 +6,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple7;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
+import org.apache.flink.streaming.api.functions.windowing.AllWindowFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
@@ -40,30 +39,24 @@ public class OnlineMetrics {
 	 * @return
 	 */
 	public SingleOutputStreamOperator<Tuple1<Integer>> getCount(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data) {
-		return data.keyBy(0)
-				.timeWindow(TIME_WINDOW)
-				.apply(new Counter());
+		System.out.println("new code working");
+		return data.timeWindowAll(TIME_WINDOW).apply(new Counter());
 	}
-
-
+	
 	/**
 	 * Counts the elements in the window
 	 *
 	 */
-	public static class Counter implements WindowFunction<Tuple7<String, String, Integer, String, Date, String, List<Double>> 
-	, Tuple1<Integer>, Tuple, TimeWindow>{
+	public static class Counter implements AllWindowFunction<Tuple7<String, String, Integer, String, Date, String, List<Double>> 
+	, Tuple1<Integer>, TimeWindow>{
 
 		private static final long serialVersionUID = 968401493677797810L;
 
 		@Override
 		public void apply(
-				Tuple key,
 				TimeWindow window,
 				Iterable<Tuple7<String, String, Integer, String, Date, String, List<Double>>> input,
 				Collector<Tuple1<Integer>> out) throws Exception {
-			
-			
-			//Date timeStamp = ((Tuple1<Date>) key).f0;
 			int counter = 0;
 		
 			for(Tuple7<String, String, Integer, String, Date, String, List<Double>> tuple: input){
@@ -71,29 +64,28 @@ public class OnlineMetrics {
 			}
 			
 			out.collect(new Tuple1<Integer>(counter));
+			
 		}
+
+
 		
 	}
-	
-	
+
 	public SingleOutputStreamOperator<Tuple2<Double, String>> getAverageReactionTime(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data) {
-		return data.keyBy(4) // group by timeStamp
-				.timeWindow(TIME_WINDOW)
-				.apply(new AverageWindowFunction());
+		return data.timeWindowAll(TIME_WINDOW).apply(new AverageWindowFunction());
 	}
 	
 	/**
 	 * Calculates the average reaction time in the specified window
 	 * Returns a tuple<avg, timeStamp>
 	 */
-	public static class AverageWindowFunction implements WindowFunction<Tuple7<String, String, Integer, String, Date, String, List<Double>> 
-	, Tuple2<Double, String>, Tuple, TimeWindow>{
+	public static class AverageWindowFunction implements AllWindowFunction<Tuple7<String, String, Integer, String, Date, String, List<Double>> 
+	, Tuple2<Double, String>, TimeWindow>{
 
 		private static final long serialVersionUID = 968401493677797810L;
 
 		@Override
 		public void apply(
-				Tuple key,
 				TimeWindow window,
 				Iterable<Tuple7<String, String, Integer, String, Date, String, List<Double>>> input,
 				Collector<Tuple2<Double, String>> out) throws Exception {
@@ -120,29 +112,29 @@ public class OnlineMetrics {
 			
 			out.collect(new Tuple2<Double, String>(avg, new Date().toString()));
 		}
+
+		
 		
 	}
 	
 	public SingleOutputStreamOperator<Tuple3<Double, String, Integer>> getMedianReactionTime(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data) {
-		return data.keyBy(4) // group by timeStamp
-				.timeWindow(TIME_WINDOW)
-				.apply(new MedianWindowFunction());
+		return data.timeWindowAll(TIME_WINDOW).apply(new MedianWindowFunction());
 	}
 	
 	/**
 	 * Calculates the median reaction time in the specified window
 	 */
-	public static class MedianWindowFunction implements WindowFunction<Tuple7<String, String, Integer, String, Date, String, List<Double>> 
-	, Tuple3<Double, String, Integer>, Tuple, TimeWindow>{
+	public static class MedianWindowFunction implements AllWindowFunction<Tuple7<String, String, Integer, String, Date, String, List<Double>> 
+	, Tuple3<Double, String, Integer>, TimeWindow>{
 
 		private static final long serialVersionUID = 968401493677797810L;
 
 		@Override
 		public void apply(
-				Tuple key,
 				TimeWindow window,
 				Iterable<Tuple7<String, String, Integer, String, Date, String, List<Double>>> input,
-				Collector<Tuple3<Double, String, Integer>> out) throws Exception {
+				Collector<Tuple3<Double, String, Integer>> out)
+				throws Exception {
 			
 			// collect reaction times into list
 			List<Double> reactionTimeList = new ArrayList<Double>();
@@ -165,21 +157,20 @@ public class OnlineMetrics {
 			
 		    // Tuple3 = median, timeStamp, test count
 			out.collect(new Tuple3<Double, String, Integer>(median, new Date().toString(), reactionTimeCount));
+			
 		}
 		
 	}
 	
 	public SingleOutputStreamOperator<Tuple3<Double, String, Integer>> getMinMaxReactionTimeByTimeWindow(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data, int value) {
-		return data.keyBy(4) // group by timeStamp
-				.timeWindow(TIME_WINDOW)
-				.apply(new MinMaxWindowFunction(value));
+		return data.timeWindowAll(TIME_WINDOW).apply(new MinMaxWindowFunction(value));
 	}
 	
 	/**
 	 * Calculates the min / max reaction time in the specified window
 	 */
-	public static class MinMaxWindowFunction implements WindowFunction<Tuple7<String, String, Integer, String, Date, String, List<Double>> 
-	, Tuple3<Double, String, Integer>, Tuple, TimeWindow>{
+	public static class MinMaxWindowFunction implements AllWindowFunction<Tuple7<String, String, Integer, String, Date, String, List<Double>> 
+	, Tuple3<Double, String, Integer>, TimeWindow>{
 
 		private static final long serialVersionUID = 968401493677797810L;
 
@@ -191,11 +182,10 @@ public class OnlineMetrics {
 
 		@Override
 		public void apply(
-				Tuple key,
 				TimeWindow window,
 				Iterable<Tuple7<String, String, Integer, String, Date, String, List<Double>>> input,
-				Collector<Tuple3<Double, String, Integer>> out) throws Exception {
-			
+				Collector<Tuple3<Double, String, Integer>> out)
+				throws Exception {
 			// collect reaction times into list
 			List<Double> reactionTimeList = new ArrayList<Double>();
 			for(Tuple7<String, String, Integer, String, Date, String, List<Double>> tuple: input){
@@ -223,21 +213,19 @@ public class OnlineMetrics {
 	 */
 	public SingleOutputStreamOperator<Tuple2<String, Double>> getPredictedReactionTimeByAVGs(
 			DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data, double avg) {
-		    return data.keyBy(4) // group by timeStamp
-				.timeWindow(TIME_WINDOW)
-				.apply(new AverageWindowFunction()) 
-				.keyBy(0)
-				.flatMap(new PedictionByAVGFlatMap(avg));
+		    return data
+		    		.timeWindowAll(TIME_WINDOW)
+		    		.apply(new AverageWindowFunction())
+		    		.flatMap(new PedictionByAVGFlatMap(avg));
 	}
 	
 
 	public SingleOutputStreamOperator<Tuple2<String, Double>> getPredictedReactionTimeBySlidingAVGs(
 			DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data, double avg, Time slide) {
-		    return data.keyBy(4) // group by timeStamp
-				.timeWindow(TIME_WINDOW, slide)
-				.apply(new AverageWindowFunction()) 
-				.keyBy(0)
-				.flatMap(new PedictionByAVGFlatMap(avg));
+		    return data
+		    		.timeWindowAll(TIME_WINDOW, slide)
+		    		.apply(new AverageWindowFunction())
+		    		.flatMap(new PedictionByAVGFlatMap(avg));
 	}
 	
 	/**
@@ -267,11 +255,10 @@ public class OnlineMetrics {
 	public SingleOutputStreamOperator<Tuple2<String, Double>> getPredictedReactionTimeByMedians(
 			DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data,
 			double median) {
-	    return data.keyBy(4) 
-			.timeWindow(TIME_WINDOW)
-			.apply(new MedianWindowFunction()) 
-			.keyBy(0)
-			.flatMap(new PedictionByMedianFlatMap(median));
+		return data
+				.timeWindowAll(TIME_WINDOW)
+				.apply(new MedianWindowFunction())
+				.flatMap(new PedictionByMedianFlatMap(median));
 	}
 	
 	/**
@@ -301,15 +288,11 @@ public class OnlineMetrics {
 	public SingleOutputStreamOperator<Tuple1<Integer>> getAverageReactionTimeBySlidingWindow(
 			DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data,
 			Time slideTime) {
-		return data.keyBy(0)
-				.timeWindow(TIME_WINDOW, slideTime)
-				.apply(new Counter());
+		return data.timeWindowAll(TIME_WINDOW, slideTime).apply(new Counter());
 	}
 	
 	public SingleOutputStreamOperator<Tuple1<Integer>> getCount(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data, Time slideTime) {
-		return data.keyBy(0)
-				.timeWindow(TIME_WINDOW, slideTime)
-				.apply(new Counter());
+		return data.timeWindowAll(TIME_WINDOW).apply(new Counter());
 	}
 	
 
