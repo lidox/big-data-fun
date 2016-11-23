@@ -52,6 +52,8 @@ public class BatchFunctions {
 		
 		try {
 			DataSet<Tuple2<Double, Integer>> sumData = data.sum(1);
+			// I use the collected data for streams later, so i need to collect instead 
+			// of printing it directly
 			count = sumData.collect().get(0).f1;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -83,6 +85,9 @@ public class BatchFunctions {
 					return ret;
 				}
 			});
+			// I use the collected data for streams later, so i need to collect instead 
+			// of printing it directly. And in this case, i know, that the DataSet contains only a single tuple.
+			// Thus I won't have problems calculating over big data
 			count = sumData.collect().get(0).f1;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -164,7 +169,9 @@ public class BatchFunctions {
 					}
 				}
 			});
-		
+			// I use the collected data for streams later, so i need to collect instead 
+			// of printing it directly. And in this case, i know, that the DataSet contains only a single tuple.
+			// Thus I won't have problems calculating over big data
 			ret = minData.collect().get(0);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -196,7 +203,9 @@ public class BatchFunctions {
 					}
 				}
 			});
-		
+			// I use the collected data for streams later, so i need to collect instead 
+			// of printing it directly. And in this case, i know, that the DataSet contains only a single tuple.
+			// Thus I won't have problems calculating over big data
 			ret = maxData.collect().get(0);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -276,28 +285,7 @@ public class BatchFunctions {
 		}
 		
 	}
-	
-	/*
-	public static class Counter implements FlatMapFunction<Tuple2<Double, Integer>, Tuple2<Double, Integer>>{
 
-		private static final long serialVersionUID = 956347222383551L;
-
-		@Override
-		public void flatMap(Tuple2<Double, Integer> value, Collector<Tuple2<Double, Integer>> out) {
-			
-			int globalCounter = 1;
-			int userCount = value.f1;
-			double reactionTime = value.f0;
-			
-			for(int i = 0; i < userCount; i++){
-				out.collect(new Tuple2<Double, Integer>(reactionTime, globalCounter));
-				globalCounter++;
-			}
-			
-		}
-		
-	}
-	*/
 
 	public double getMedianReactionTime(DataSet<Tuple2<Double, Integer>> data) throws Exception {
 		DataSet<Tuple2<Double, Integer>> allReactionTests = data.flatMap(new Medianizer());
