@@ -39,9 +39,14 @@ curl -XPOST 'localhost:9200/customer/external/1/_update?pretty' -d '
   "doc": { "name": "Jane Doe", "age": 20 }
 }'
 ```
-###Deleting Documentsedit
+###Deleting Documents edit
 ```
 curl -XDELETE 'localhost:9200/customer/external/2?pretty'
+```
+
+### Delete item by ID
+```
+curl -XDELETE 'http://localhost:9200/reactiontest/humanbenchmark/AViR0dNxYrj4DPRpfz1N'
 ```
 
 ##The Search APIedit
