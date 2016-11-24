@@ -22,10 +22,10 @@ public class StreamMetrics {
 			DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> dataStream1 = stream.getKafkaStream();
 	
 			// metric: count by tumbling window
-			//stream.printCount(dataStream1, Time.seconds(10));
+			stream.printCount(dataStream1, Time.seconds(10));
 			
 			// metric: average by tumbling window
-			stream.printAverage(dataStream1, Time.seconds(10));
+			//stream.printAverage(dataStream1, Time.seconds(10));
 			
 			// metric: median by tumbling window
 			//stream.printMedianByTimeWindow(dataStream1, Time.seconds(10));

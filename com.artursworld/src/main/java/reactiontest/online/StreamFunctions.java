@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple7;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer08;
@@ -62,6 +64,11 @@ public class StreamFunctions {
 	 */
 	public DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> getKafkaStream() throws Exception { 
 		DataStream<String> textStream = readFromKafka(env);
+		DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> result = null;
+		result = textStream.flatMap(new String2TupleFlatMapFunction());
+		
+		new ElasticSearch().sinkToElasticSearch(result);
+		
 		return textStream.flatMap(new String2TupleFlatMapFunction());
 	}
 	
@@ -125,12 +132,10 @@ public class StreamFunctions {
 	 * Reads a DataStream<String> from Kafka and sinks it
 	 * @throws UnknownHostException
 	 */
-	public void sinkToElasticSearch(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data) throws Exception {
+	public static void sinkToElasticSearch(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data) throws Exception {
 		ElasticSearch elastic = new ElasticSearch();
-		elastic.writeToElasticSelf(data);
+		elastic.sinkToElasticSearch(data);
 		System.out.println("SUCCESS sink"); 
-		//data.print();
-		//env.execute();
 	}
 	
 	public static Tuple7<String, String, Integer, String, Date, String, List<Double>> getTupleByJSON2(
@@ -173,7 +178,8 @@ public class StreamFunctions {
 
 	public void printPredictionForNextReactionTimeByAVGs(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data, double average, Time time) {
 		metrics.setTimeWindow(time);  
-		metrics.getPredictedReactionTimeByAVGs(data, average).print();
+		SingleOutputStreamOperator<Tuple2<String, Double>> result = metrics.getPredictedReactionTimeByAVGs(data, average);
+		result.print();
 	}
 
 	public void printPredictionForNextReactionTimeByMedians(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data,double median,Time time) {

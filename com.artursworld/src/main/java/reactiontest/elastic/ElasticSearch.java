@@ -1,7 +1,6 @@
 package reactiontest.elastic;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple7;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -38,11 +38,15 @@ public class ElasticSearch {
 	
 	private static Client client = null;
 	
-	public ElasticSearch() throws UnknownHostException {
-		Settings settings = Settings.settingsBuilder()
-		        .put("cluster.name", ES_CLUSTER_NAME).build();
-		client = TransportClient.builder().settings(settings).build()
-				.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(ES_DOMAIN), ES_PORT));
+	public ElasticSearch() {
+		try {
+			Settings settings = Settings.settingsBuilder()
+			        .put("cluster.name", ES_CLUSTER_NAME).build();
+			client = TransportClient.builder().settings(settings).build()
+					.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(ES_DOMAIN), ES_PORT));		
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void search(String column, String textToSearch){
@@ -71,8 +75,20 @@ public class ElasticSearch {
 		client.close();
 	}
 	
-	public void writeToElasticSelf(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data){
+	public void sinkToElasticSearch(DataStream<Tuple7<String, String, Integer, String, Date, String, List<Double>>> data){
 		data.flatMap(new ElalsticSinker());
+	}
+	
+	public void writeToElasticSelf(List<Tuple2<Double, Integer>> list, String indexName, String typeName){
+		for(int i = 0; i < list.size(); i++){
+			//for(int j = 0; j < list.get(i).f1; j++){	
+				Map<String, Object> esJson = new HashMap<>();           
+	            esJson.put("usercount", list.get(i).f1);
+	            esJson.put("reactiontime", list.get(i).f0);
+				client.prepareIndex(indexName, typeName)  .setSource(esJson) .get();
+				System.out.println("write: " + esJson.toString()); 
+			//}
+		}
 	}
 	
 	/**
@@ -104,7 +120,6 @@ public class ElasticSearch {
 			
 			output.collect(tuple);
 		}
-		
 	}
 	
 
@@ -115,6 +130,12 @@ public class ElasticSearch {
 	 * @throws Exception
 	 */
 	public DataStream<String> getStream(StreamExecutionEnvironment env) throws Exception {
+		Collection<String> retList = getCollectionByFromElasticSearch();
+		DataStream<String> textStream = env.fromCollection(retList);
+		return textStream;	
+	}
+
+	public Collection<String> getCollectionByFromElasticSearch() {
 		List<Map<String, Object>> maplist = getAllDocumentsFromElasticSearch();
 		Collection<String> retList = new ArrayList<String>();
 		for(int i = 0; i < maplist.size(); i++){
@@ -122,8 +143,7 @@ public class ElasticSearch {
 			StringBuilder sb = deleteBracketsAtArray(obj);
 			retList.add(sb.toString());
 		}
-		DataStream<String> textStream = env.fromCollection(retList);
-		return textStream;	
+		return retList;
 	}
 
 	private StringBuilder deleteBracketsAtArray(JSONObject obj) {

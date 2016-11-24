@@ -17,6 +17,8 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
+import com.google.common.collect.Iterables;
+
 /**
  * Provides some metric functions for online analysis
  *
@@ -59,10 +61,14 @@ public class OnlineMetrics {
 				Collector<Tuple1<Integer>> out) throws Exception {
 			int counter = 0;
 		
+			for(int i = 0; i < Iterables.size(input) ; i++){
+				counter ++;
+			}
+		    /*
 			for(Tuple7<String, String, Integer, String, Date, String, List<Double>> tuple: input){
 				counter ++;
 			}
-			
+			*/
 			out.collect(new Tuple1<Integer>(counter));
 			
 		}

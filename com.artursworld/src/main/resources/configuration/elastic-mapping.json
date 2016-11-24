@@ -47,3 +47,28 @@ curl -XPUT 'localhost:9200/reactiontest/_mapping/reactiontest-log' -d '{
 	"type":"PreOperation",
 	"times":[412,399,324]
 }
+
+// mapping for human benchmark data
+
+# create reactiontest index
+curl -XPUT 'http://localhost:9200/humanbenchmark/' -d '{
+    "settings" : {
+        "index" : {
+            "number_of_shards" : 1, 
+            "number_of_replicas" : 0
+        }
+    }
+}'
+
+# put mapping for viper-log doctype
+curl -XPUT 'localhost:9200/humanbenchmark/_mapping/reactiontests' -d '{
+      "properties": {
+            "usercount": {
+              "type": "integer",
+              "index": "not_analyzed"
+            },
+            "reactiontime": {
+                "type": "double"
+            }
+      }
+}'
