@@ -49,6 +49,7 @@ public class ElasticSearch {
 		}
 	}
 
+	// TODO: delete?
 	public void search(String column, String textToSearch){
 		SearchResponse response = client.prepareSearch(ES_INDEX_NAME)
 		        .setTypes(ES_TYPE_NAME)
@@ -79,15 +80,18 @@ public class ElasticSearch {
 		data.flatMap(new ElalsticSinker());
 	}
 	
-	public void writeToElasticSelf(List<Tuple2<Double, Integer>> list, String indexName, String typeName){
+	/**
+	 * Sink a list of data into elastic search
+	 * @param list the list to sink
+	 * @param indexName the index name of elasticsearch to use
+	 * @param typeName the type name of elasticsearch to use
+	 */
+	public void sinkHumanBenchmarkMyIndexAndTypeName(List<Tuple2<Double, Integer>> list, String indexName, String typeName){
 		for(int i = 0; i < list.size(); i++){
-			//for(int j = 0; j < list.get(i).f1; j++){	
-				Map<String, Object> esJson = new HashMap<>();           
-	            esJson.put("usercount", list.get(i).f1);
-	            esJson.put("reactiontime", list.get(i).f0);
-				client.prepareIndex(indexName, typeName)  .setSource(esJson) .get();
-				System.out.println("write: " + esJson.toString()); 
-			//}
+			Map<String, Object> esJson = new HashMap<>();           
+	        esJson.put("usercount", list.get(i).f1);
+	        esJson.put("reactiontime", list.get(i).f0);
+		    client.prepareIndex(indexName, typeName)  .setSource(esJson) .get();
 		}
 	}
 	
@@ -112,7 +116,7 @@ public class ElasticSearch {
             esJson.put("type", tuple.f5);
             esJson.put("times", tuple.f6);
 
-			// IndexResponse response = 
+			// sink data
 			client.prepareIndex(ES_INDEX_NAME, ES_TYPE_NAME)
 			        .setSource(esJson)
 			        .get();
@@ -122,7 +126,6 @@ public class ElasticSearch {
 		}
 	}
 	
-
 	/**
 	 * Get Datastream by elasticsearch 
 	 * @param env
@@ -130,13 +133,17 @@ public class ElasticSearch {
 	 * @throws Exception
 	 */
 	public DataStream<String> getStream(StreamExecutionEnvironment env) throws Exception {
-		Collection<String> retList = getCollectionByFromElasticSearch();
+		Collection<String> retList = getCollectionJSONStringsByElasticSearch(ES_INDEX_NAME, ES_TYPE_NAME);
 		DataStream<String> textStream = env.fromCollection(retList);
 		return textStream;	
 	}
 
-	public Collection<String> getCollectionByFromElasticSearch() {
-		List<Map<String, Object>> maplist = getAllDocumentsFromElasticSearch();
+	/**
+	 * Getting a collection of JSON strings
+	 * @return
+	 */
+	public Collection<String> getCollectionJSONStringsByElasticSearch(String indexName, String typeName) {
+		List<Map<String, Object>> maplist = getLisfOfMapsByIndexAndTypeName(indexName, typeName);
 		Collection<String> retList = new ArrayList<String>();
 		for(int i = 0; i < maplist.size(); i++){
 			JSONObject obj = new JSONObject(maplist.get(i));
@@ -157,14 +164,18 @@ public class ElasticSearch {
 		return sb;
 	}
 	
-	private List<Map<String, Object>> getAllDocumentsFromElasticSearch(){
-        int scrollSize = 1000;
+	//private List<Map<String, Object>> getAllDocumentsFromElasticSearch(){
+     //   return getLisfOfMapsByIndexAndTypeName(ES_INDEX_NAME, ES_TYPE_NAME);
+	//}
+
+	private List<Map<String, Object>> getLisfOfMapsByIndexAndTypeName(String indexName, String typeName) {
+		int scrollSize = 1000;
         List<Map<String,Object>> esData = new ArrayList<Map<String,Object>>();
         SearchResponse response = null;
         int i = 0;
         while( response == null || response.getHits().hits().length != 0){
-            response = client.prepareSearch(ES_INDEX_NAME)
-                    .setTypes(ES_TYPE_NAME)
+            response = client.prepareSearch(indexName)
+                    .setTypes(typeName)
                        .setQuery(QueryBuilders.matchAllQuery())
                        .setSize(scrollSize)
                        .setFrom(i * scrollSize)
@@ -176,6 +187,6 @@ public class ElasticSearch {
             i++;
         }
         return esData;
-}
+	}
 	
 }

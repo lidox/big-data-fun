@@ -1,7 +1,6 @@
 package reactiontest.elastic;
 
 import java.net.UnknownHostException;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.flink.api.java.DataSet;
@@ -31,14 +30,16 @@ public class TransferData2ElasticSearch {
 		ElasticSearch es = new ElasticSearch();
 		String indexName = "humanbenchmark";
 		String typeName = "reactiontests";
-		es.writeToElasticSelf(list, indexName, typeName);
+		es.sinkHumanBenchmarkMyIndexAndTypeName(list, indexName, typeName);
 	}
 
+	/*
 	private static void getRecordsFromES() throws UnknownHostException {
 		ElasticSearch s = new ElasticSearch();
 		Collection<String> collection= s.getCollectionByFromElasticSearch();
 		String st = collection.toString();
 		System.out.println(st);
 	}
+	*/
 	
 }
