@@ -32,16 +32,25 @@ public class MainCompare {
 		
 		
 		// Prediction 1:
-		//printPredictionByAverage();
+		printPredictionByAverage();
 		
 		// Prediction 2:
 		printPredictionByAVGofMedians();
 		
 		// Prediction 3:
-		//printPredictionBySlidingAverage();
+		printPredictionBySlidingAverage();
 		
 	}
 
+	/**
+	 * The prediction algorithm: 
+	 * 1. calculate median of reaction times from offline human benchmark data using JSON files
+	 * 2. calculate median of reaction times from own reaction time data using ElastiSearch
+	 * 3. calculate the average of both medians
+	 * 4. calculate the median of the data coming from the stream using thumbling window
+	 * 5. Prediction for the next RT: Average of 4. and 3.
+	 * @throws Exception
+	 */
 	private static void printPredictionByAVGofMedians() throws Exception {
 		// Prediction 2: Median off all reaction data since October 2016 
 		// and last reaction times specified by tumbling window
@@ -64,7 +73,16 @@ public class MainCompare {
 		stream.printPredictionForNextReactionTimeByMedians(dataStream1, median, Time.seconds(10));
 		stream.execute();
 	}
-
+	
+	/**
+	 * The prediction algorithm: 
+	 * 1. calculate mean of reaction times from offline human benchmark data using JSON files
+	 * 2. calculate mean of reaction times from own reaction time data using ElastiSearch
+	 * 3. calculate the mean of both means
+	 * 4. calculate the mean of the data coming from the stream using thumbling window
+	 * 5. Prediction for the next RT: Average of 4. and 3.
+	 * @throws Exception
+	 */
 	private static void printPredictionByAverage() throws Exception {
 		// Prediction 1: Average off October 2016 reaction data + tumbling window
 		
@@ -142,6 +160,15 @@ public class MainCompare {
 	}
 	*/
 	
+	/**
+	 * The prediction algorithm: 
+	 * 1. calculate median of reaction times from offline human benchmark data using JSON files
+	 * 2. calculate median of reaction times from own reaction time data using ElastiSearch
+	 * 3. calculate the average of both medians
+	 * 4. calculate the median of the data coming from the stream using sliding window
+	 * 5. Prediction for the next RT: mean of 4. and 3.
+	 * @throws Exception
+	 */
 	private static void printPredictionBySlidingAverage() throws Exception {
 		// Prediction 3: Average off October 2016 reaction data + tumbling window
 		
