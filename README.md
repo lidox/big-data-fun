@@ -119,10 +119,10 @@ sudo dpkg -i kibana_4.5.1_amd64.deb
 cd /opt/kafka_2.10-0.8.2.1
 
 # start zookeeper server
-./bin/zookeeper-server-start.sh ./config/zookeeper.properties &
+./bin/zookeeper-server-start.sh ./config/zookeeper.properties 
 
 # start broker
-./bin/kafka-server-start.sh ./config/server.properties &
+./bin/kafka-server-start.sh ./config/server.properties 
 
 # create topic “reactiontest”
  ./bin/kafka-topics.sh --create --topic reactiontest --zookeeper localhost:2181 --partitions 1 --replication-factor 1
