@@ -139,25 +139,31 @@ Producer message:
 ```
 ## Start ElasticSearch
 ```
-cd /Dokumente/elasticsearch-2.3.4/bin
+cd ~/Dokumente/elasticsearch-2.3.4/bin
 
 # start elasticsearch
-./elasticsearch --cluster.name my-demo --node.name my-node
+./elasticsearch --cluster.name my-demo --node.name my-node &
 
 # make a search
 curl 'localhost:9200/viper-test/viper-log/_search?regina'
 
 ```
+
+## Start Eclipse IDE
+```
+cd /opt/eclipse/
+sudo ./kibana
+```
 ## Start Kibana
 ```
-cd /otp/kibana/bin
+cd /opt/kibana/bin
 sudo ./kibana
 ```
 Now check [the browser](http://localhost:5601)
 
 # Additional stuff
-To make things easier you could create a start script for
-all tools used like Hadoop, ElasticSearch, Kibana, Kafka etc.
+To make things easier a start script could be created for
+all tools used like ElasticSearch, Kibana, Kafka etc.
 ```
 sudo nano /usr/local/bin/bigdata
 
