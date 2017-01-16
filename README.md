@@ -152,7 +152,7 @@ curl 'localhost:9200/viper-test/viper-log/_search?regina'
 ## Start Eclipse IDE
 ```
 cd /opt/eclipse/
-sudo ./kibana
+./eclipse &
 ```
 ## Start Kibana
 ```
